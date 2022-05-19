@@ -56,14 +56,14 @@ public class EventService  {
     }
 
 
-    public Date findEndDate(Date date, Integer duration){
-        return new Date(date.getTime()+(duration*60000));
-    }
-
-
-    public ZonedDateTime findEndDate(ZonedDateTime date, Integer duration){
-        return date.plusMinutes(duration);
-    }
+//    public Date findEndDate(Date date, Integer duration){
+//        return new Date(date.getTime()+(duration*60000));
+//    }
+//
+//
+//    public ZonedDateTime findEndDate(ZonedDateTime date, Integer duration){
+//        return date.plusMinutes(duration);
+//    }
 
     public List<EventDTO> getAllEvent() {
         List<Event> eventList = repository.findAllByOrderByEventStartTimeDesc();
