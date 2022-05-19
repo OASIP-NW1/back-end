@@ -3,8 +3,6 @@ package com.example.oasipkw1.services;
 import com.example.oasipkw1.dtos.EventDTO;
 import com.example.oasipkw1.dtos.EventPageDTO;
 import com.example.oasipkw1.entites.Event;
-import com.example.oasipkw1.entites.EventCategory;
-import com.example.oasipkw1.repository.EventCategoryRepository;
 import com.example.oasipkw1.repository.EventRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 
-//
 @Service
-
 public class EventService  {
 
     @Autowired
@@ -54,7 +46,6 @@ public class EventService  {
 //        }
         return repository.saveAndFlush(event);
     }
-
 
 //    public Date findEndDate(Date date, Integer duration){
 //        return new Date(date.getTime()+(duration*60000));
