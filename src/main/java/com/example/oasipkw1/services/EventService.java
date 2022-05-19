@@ -36,22 +36,22 @@ public class EventService  {
     private EventRepository repository;
 
     public Event save(Event event) {
-        Date newEventStartTime = Date.from(event.getEventStartTime());
-        Date newEventEndTime = findEndDate(Date.from(event.getEventStartTime()), event.getEventDuration());
-        List<EventDTO> eventList = getAllEvent();
-
-        for (int i = 0; i < eventList.size(); i++) {
-            Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
-            Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()),eventList.get(i).getEventDuration());
-            if (newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventStartTime) ||
-                    newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventEndTime) ||
-                    newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventEndTime) ||
-                    newEventStartTime.after(eventStartTime) && newEventEndTime.before(eventEndTime)
-                    || newEventStartTime.equals(eventStartTime)) {
-
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
-            }
-        }
+//        Date newEventStartTime = Date.from(event.getEventStartTime());
+//        Date newEventEndTime = findEndDate(Date.from(event.getEventStartTime()), event.getEventDuration());
+//        List<EventDTO> eventList = getAllEvent();
+//
+//        for (int i = 0; i < eventList.size(); i++) {
+//            Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
+//            Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()),eventList.get(i).getEventDuration());
+//            if (newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventStartTime) ||
+//                    newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventEndTime) ||
+//                    newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventEndTime) ||
+//                    newEventStartTime.after(eventStartTime) && newEventEndTime.before(eventEndTime)
+//                    || newEventStartTime.equals(eventStartTime)) {
+//
+//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
+//            }
+//        }
         return repository.saveAndFlush(event);
     }
 
