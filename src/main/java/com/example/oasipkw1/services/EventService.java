@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -28,33 +29,29 @@ public class EventService  {
     private EventRepository repository;
 
     public Event save(Event event) {
-//        Date newEventStartTime = Date.from(event.getEventStartTime());
-//        Date newEventEndTime = findEndDate(Date.from(event.getEventStartTime()), event.getEventDuration());
-//        List<EventDTO> eventList = getAllEvent();
-//
-//        for (int i = 0; i < eventList.size(); i++) {
-//            Date eventStartTime = Date.from(eventList.get(i).getEventStartTime());
-//            Date eventEndTime = findEndDate(Date.from(eventList.get(i).getEventStartTime()),eventList.get(i).getEventDuration());
-//            if (newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventStartTime) ||
-//                    newEventStartTime.before(eventEndTime) && newEventEndTime.after(eventEndTime) ||
-//                    newEventStartTime.before(eventStartTime) && newEventEndTime.after(eventEndTime) ||
-//                    newEventStartTime.after(eventStartTime) && newEventEndTime.before(eventEndTime)
-//                    || newEventStartTime.equals(eventStartTime)) {
-//
-//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
-//            }
-//        }
+        ZonedDateTime newEventStartTime = event.getEventStartTime();
+        ZonedDateTime newEventEndTime = findEndDate(event.getEventStartTime(), event.getEventDuration());
+        List<EventDTO> eventList = getAllEvent();
+
+        for (int i = 0; i < eventList.size(); i++) {
+            ZonedDateTime eventStartTime = eventList.get(i).getEventStartTime();
+            ZonedDateTime eventEndTime = findEndDate(eventList.get(i).getEventStartTime(),
+                    eventList.get(i).getEventDuration());
+            if (newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventStartTime) ||
+                    newEventStartTime.isBefore(eventEndTime) && newEventEndTime.isAfter(eventEndTime) ||
+                    newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventEndTime) ||
+                    newEventStartTime.isAfter(eventStartTime) && newEventEndTime.isBefore(eventEndTime)
+                    || newEventStartTime.equals(eventStartTime)) {
+
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
+            }
+        }
         return repository.saveAndFlush(event);
     }
 
-//    public Date findEndDate(Date date, Integer duration){
-//        return new Date(date.getTime()+(duration*60000));
-//    }
-//
-//
-//    public ZonedDateTime findEndDate(ZonedDateTime date, Integer duration){
-//        return date.plusMinutes(duration);
-//    }
+    public ZonedDateTime findEndDate(ZonedDateTime date, Integer duration){
+        return date.plusMinutes(duration);
+    }
 
     public List<EventDTO> getAllEvent() {
         List<Event> eventList = repository.findAllByOrderByEventStartTimeDesc();

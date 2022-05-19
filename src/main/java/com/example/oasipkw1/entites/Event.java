@@ -35,8 +35,7 @@ public class Event {
 
     @NotNull(message = "StartTime cannot null")
     @Future(message = "Required futer date time")
-    private Instant eventStartTime;
-//    @Column(name = "eventStartTime", nullable = false)
+    private ZonedDateTime eventStartTime;
 
     @Size(max = 500,message = "Notes is invalied")
     @Column(name = "eventNote")
