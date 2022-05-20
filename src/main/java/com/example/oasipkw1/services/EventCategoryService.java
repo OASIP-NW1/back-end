@@ -27,13 +27,46 @@ public class EventCategoryService {
         List<EventCategory> eventList = eventCategoryRepository.findAll();
         return listMapper.mapList(eventList, EventCategoryDTO.class, modelMapper);
     }
-    public EventCategory updateCategory(SimpleEventCategoryDTO updateCategory, Integer categoryId) {
-        EventCategory existingCategory = eventCategoryRepository.findById(categoryId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, categoryId + " Dose not exits!!!"));
+    public EventCategoryDTO getEventById(Integer id) {
+        EventCategory event = eventCategoryRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Event id " + id +
+                        "Does Not Exist !!!"
+                ));
+        return modelMapper.map(event, EventCategoryDTO.class);
+    }
 
-        existingCategory.setEventCategoryName(updateCategory.getEventCategoryName());
+    public EventCategory updateCategory(SimpleEventCategoryDTO updateCategory, Integer categoryId) {
+        EventCategory existingCategory = eventCategoryRepository.findById(categoryId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, categoryId + " Dose not exits!!!"));
+        List<EventCategoryDTO> categoryList = getAllEvent();
+        if(updateCategory.getCategoryName() == (null) || updateCategory.getCategoryName().length() == 0){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CategoryName cannot be empty");
+        }
+        if(updateCategory.getCategoryName().length() > 100){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CategoryName Must not exceed 100 characters.");
+        }
+        if(!(existingCategory.getEventCategoryName().trim().equalsIgnoreCase(updateCategory.getCategoryName().trim()))){
+            for (int i = 0; i < categoryList.size(); i++)
+                if (categoryList.get(i).getEventCategoryName().trim().equalsIgnoreCase(updateCategory.getEventCategoryName().trim())) {
+                    if (categoryList.get(i).getEventCategoryDescription().equalsIgnoreCase(updateCategory.getEventCategoryDescription()) && categoryList.get(i).getEventDuration() == updateCategory.getEventDuration()) {
+                        existingCategory.setEventCategoryDescription(updateCategory.getEventCategoryDescription());
+                        existingCategory.setEventDuration(updateCategory.getEventDuration());
+                        existingCategory.setEventCategoryName(updateCategory.getEventCategoryName().trim());
+                        return eventCategoryRepository.saveAndFlush(existingCategory);
+                    } else {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This name is overlapping");
+                    }
+                }
+            }
+        if(updateCategory.getEventDuration() < 1 || updateCategory.getEventDuration() > 480){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Duration must between 1-480 min.");
+        }
+        if(updateCategory.getEventCategoryDescription().length() > 500){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Description Must not exceed 500 characters.");
+        }
         existingCategory.setEventCategoryDescription(updateCategory.getEventCategoryDescription());
         existingCategory.setEventDuration(updateCategory.getEventDuration());
+        existingCategory.setEventCategoryName(updateCategory.getEventCategoryName());
         return eventCategoryRepository.saveAndFlush(existingCategory);
     }
 }
