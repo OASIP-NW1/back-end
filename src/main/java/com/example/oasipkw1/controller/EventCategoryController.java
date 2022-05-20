@@ -8,6 +8,7 @@ import com.example.oasipkw1.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -22,7 +23,10 @@ public class EventCategoryController {
     }
 
     @PutMapping("/{id}")
-    public EventCategory updateCategory(@RequestBody SimpleEventCategoryDTO updateCategory, @PathVariable Integer id) {
+    public EventCategory updateCategory(
+            @Valid
+            @RequestBody SimpleEventCategoryDTO updateCategory,
+            @PathVariable Integer id) {
         return eventCategoryService.updateCategory(updateCategory, id);
     }
 }
