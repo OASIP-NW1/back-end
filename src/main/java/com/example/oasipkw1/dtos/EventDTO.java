@@ -1,13 +1,11 @@
 package com.example.oasipkw1.dtos;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
 
 import javax.validation.constraints.*;
-import java.time.Instant;
 import java.time.ZonedDateTime;
 
 @Getter
@@ -27,10 +25,9 @@ public class EventDTO {
     private String bookingEmail;
 
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Bangkok")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @NotNull(message = "StartTime cannot null")
-    @Future(message = "Required future date time")
-//    @PastOrPresent(message = "Time is Overlap")
+    @Future(message = "Required futer date time")
     private ZonedDateTime eventStartTime;
 
     private Integer eventDuration;

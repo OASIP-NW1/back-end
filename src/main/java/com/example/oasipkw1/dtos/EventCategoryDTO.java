@@ -6,20 +6,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.sql.Time;
-import java.time.LocalTime;
+import javax.validation.constraints.*;
 
 @Getter
 @Setter
+//@NoArgsConstructor
+//@AllArgsConstructor
 public class EventCategoryDTO {
 
     @NotNull(message = "ID cannot null")
     private Integer id;
 
+    @NotBlank(message = "eventCategoryName cannot be empty")
+    @Size(max = 100, message = "eventCategoryName Must not exceed 100 characters.")
     private String eventCategoryName;
 
     private String eventCategoryDescription;

@@ -6,9 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 @Getter
 @Setter
@@ -22,6 +20,8 @@ public class EventCategory {
     @Column(name = "eventCategoryId", nullable = false)
     private Integer id;
 
+    @NotBlank(message = "eventCategoryName cannot be empty")
+    @Size(max = 100, message = "eventCategoryName Must not exceed 100 characters.")
     @Column(name = "eventCategoryName", nullable = false)
     private String eventCategoryName;
 

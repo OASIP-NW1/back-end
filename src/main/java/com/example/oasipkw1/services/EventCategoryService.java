@@ -1,7 +1,9 @@
 package com.example.oasipkw1.services;
 
 import com.example.oasipkw1.dtos.EventCategoryDTO;
+import com.example.oasipkw1.dtos.EventDTO;
 import com.example.oasipkw1.dtos.SimpleEventCategoryDTO;
+import com.example.oasipkw1.entites.Event;
 import com.example.oasipkw1.entites.EventCategory;
 import com.example.oasipkw1.repository.EventCategoryRepository;
 import org.modelmapper.ModelMapper;
@@ -39,30 +41,39 @@ public class EventCategoryService {
     public EventCategory updateCategory(SimpleEventCategoryDTO updateCategory, Integer categoryId) {
         EventCategory existingCategory = eventCategoryRepository.findById(categoryId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, categoryId + " Dose not exits!!!"));
         List<EventCategoryDTO> categoryList = getAllEvent();
+        boolean isInvaild = false;
+        String exception = "";
         if(updateCategory.getCategoryName() == (null) || updateCategory.getCategoryName().length() == 0){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CategoryName cannot be empty");
+            exception += "  CategoryName cannot be empty  ";
+            isInvaild = true;
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CategoryName cannot be empty");
         }
         if(updateCategory.getCategoryName().length() > 100){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CategoryName Must not exceed 100 characters.");
+            exception += "  CategoryName Must not exceed 100 characters.    ";
+            isInvaild = true;
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CategoryName Must not exceed 100 characters.");
         }
         if(!(existingCategory.getEventCategoryName().trim().equalsIgnoreCase(updateCategory.getCategoryName().trim()))){
-            for (int i = 0; i < categoryList.size(); i++)
+            for (int i = 0; i < categoryList.size(); i++) {
                 if (categoryList.get(i).getEventCategoryName().trim().equalsIgnoreCase(updateCategory.getEventCategoryName().trim())) {
-                    if (categoryList.get(i).getEventCategoryDescription().equalsIgnoreCase(updateCategory.getEventCategoryDescription()) && categoryList.get(i).getEventDuration() == updateCategory.getEventDuration()) {
-                        existingCategory.setEventCategoryDescription(updateCategory.getEventCategoryDescription());
-                        existingCategory.setEventDuration(updateCategory.getEventDuration());
-                        existingCategory.setEventCategoryName(updateCategory.getEventCategoryName().trim());
-                        return eventCategoryRepository.saveAndFlush(existingCategory);
-                    } else {
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This name is overlapping");
-                    }
+                    exception += "    This CategoryName is overlapping.   ";
+                    isInvaild = true;
+//                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This name is overlapping");
                 }
             }
+        }
         if(updateCategory.getEventDuration() < 1 || updateCategory.getEventDuration() > 480){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Duration must between 1-480 min.");
+            exception += "  Duration must between 1-480 min.    ";
+            isInvaild = true;
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Duration must between 1-480 min.");
         }
         if(updateCategory.getEventCategoryDescription().length() > 500){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Description Must not exceed 500 characters.");
+            exception += "  Description Must not exceed 500 characters. ";
+            isInvaild = true;
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Description Must not exceed 500 characters.");
+        }
+        if(isInvaild){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exception);
         }
         existingCategory.setEventCategoryDescription(updateCategory.getEventCategoryDescription());
         existingCategory.setEventDuration(updateCategory.getEventDuration());

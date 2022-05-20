@@ -23,13 +23,13 @@ public class CustomResponseExceptionHandler extends ResponseEntityExceptionHandl
         httpServletResponse.sendError(HttpStatus.BAD_REQUEST.value());
     }
 
-//    error handle for @valid -> sprint boot starter validation -> in entities
+    //    error handle for @valid -> sprint boot starter validation -> in entities
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
-                                        MethodArgumentNotValidException ex,
-                                        HttpHeaders headers,
-                                        HttpStatus status,
-                                        WebRequest request) {
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request) {
 //      error default
         Map<String, Object> details = new LinkedHashMap<>();
         details.put("timestamp",new Date());
