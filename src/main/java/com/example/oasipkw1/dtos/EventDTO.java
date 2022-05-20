@@ -30,6 +30,7 @@ public class EventDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Bangkok")
     @NotNull(message = "StartTime cannot null")
     @Future(message = "Required future date time")
+//    @PastOrPresent(message = "Time is Overlap")
     private ZonedDateTime eventStartTime;
 
     private Integer eventDuration;
