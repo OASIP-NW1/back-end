@@ -63,7 +63,7 @@ public class EventCategoryService {
             }
         }
         if(updateCategory.getEventDuration() < 1 || updateCategory.getEventDuration() > 480){
-            exception += "  Duration must between 1-480 min.    ";
+            exception += "  Duration is must be between 1-480 minutes.   ";
             isInvaild = true;
 //            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Duration must between 1-480 min.");
         }
