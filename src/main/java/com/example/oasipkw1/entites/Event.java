@@ -22,7 +22,7 @@ public class Event {
     private Integer id;
 
     @NotBlank(message = "Booking Name is not empty")
-    @Size(max = 100,message = "Booking Name size must between 0 and 100")
+    @Size(max = 100,message = "Booking Name size must between 0 and 100 character")
     @Column(name = "bookingName", nullable = false)
     private String bookingName;
 
@@ -38,7 +38,7 @@ public class Event {
     @Column(name = "eventStartTime", nullable = false)
     private ZonedDateTime eventStartTime;
 
-    @Size(max = 500,message = "Notes size must between 0 and 500")
+    @Size(max = 500,message = "Notes size must between 0 and 500 character")
     @Column(name = "eventNote")
     private String eventNote;
 
