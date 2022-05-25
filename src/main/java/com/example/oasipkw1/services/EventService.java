@@ -45,14 +45,14 @@ public class EventService  {
             if(eventStartTime.isEqual(newEventStartTime)){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
             }else {
-            ZonedDateTime eventEndTime = findEndDate(eventList.get(i).getEventStartTime(),
-                    eventList.get(i).getEventDuration());
-            if (newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventStartTime) ||
-                    newEventStartTime.isBefore(eventEndTime) && newEventEndTime.isAfter(eventEndTime) ||
-                    newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventEndTime) ||
-                    newEventStartTime.isAfter(eventStartTime) && newEventEndTime.isBefore(eventEndTime)
-                    || newEventStartTime.equals(eventStartTime)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
+                ZonedDateTime eventEndTime = findEndDate(eventList.get(i).getEventStartTime(),
+                        eventList.get(i).getEventDuration());
+                if (newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventStartTime) ||
+                        newEventStartTime.isBefore(eventEndTime) && newEventEndTime.isAfter(eventEndTime) ||
+                        newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventEndTime) ||
+                        newEventStartTime.isAfter(eventStartTime) && newEventEndTime.isBefore(eventEndTime)
+                        || newEventStartTime.equals(eventStartTime)) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
                 }
             }
         }

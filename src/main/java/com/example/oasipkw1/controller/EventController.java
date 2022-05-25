@@ -58,15 +58,15 @@ public class EventController {
 
     @PutMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
-    public Event update(@Valid @RequestBody Event updateEvent,
-                        @PathVariable Integer id) {
+    public void update(@Valid @RequestBody Event updateEvent,
+                       @PathVariable Integer id) {
         Event event = eventRepository.findById(id)
                 .map(o -> mapEvent(o, updateEvent))
                 .orElseGet(() -> {
                     updateEvent.setId(id);
                     return updateEvent;
                 });
-        return eventRepository.saveAndFlush(event);
+        eventService.save (event);
     }
 
     private Event mapEvent(Event existingEvent , Event updateEvent){
