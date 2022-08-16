@@ -20,8 +20,10 @@ public class UserDTO {
     private String name;
     private String email;
     private Role role ;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private ZonedDateTime createdOn;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private ZonedDateTime updatedOn;
 }
