@@ -91,7 +91,6 @@ public class UserService {
         }
         return true;
     }
-
     public boolean checkUniqueCreate (UserCreateDTO user){
         List<User> allUser = userRepository.findAll();
         for(User users : allUser){
