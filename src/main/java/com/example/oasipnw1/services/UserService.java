@@ -9,6 +9,7 @@ import com.example.oasipnw1.repository.UserRepository;
 import net.minidev.json.JSONUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,7 +28,7 @@ public class UserService {
     private ModelMapper modelMapper;
 
     public List<UserDTO> getAllUser() {
-        List<User> userList = userRepository.findAll();
+        List<User> userList = userRepository.findAll((Sort.by("name").ascending()));
         return listMapper.mapList(userList, UserDTO.class, modelMapper);
     }
 
@@ -93,10 +94,10 @@ public class UserService {
     public boolean checkUniqueCreate (UserCreateDTO user){
         List<User> allUser = userRepository.findAll();
         for(User users : allUser){
-                if(users.getName().trim().equals(user.getName().trim())){
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST , "This name is already used");
-                }else if (users.getEmail().trim().equals(user.getEmail().trim())){
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST , "This email is already used");
+            if(users.getName().trim().equals(user.getName().trim())){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST , "This name is already used");
+            }else if (users.getEmail().trim().equals(user.getEmail().trim())){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST , "This email is already used");
             }
         }
         return true;

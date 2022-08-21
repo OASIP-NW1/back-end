@@ -6,6 +6,6 @@ RUN mvn -D maven.test.skip package
 
 FROM openjdk:11-jdk
 ARG JAR_FILE=/app/target/*.jar
-COPY --from=build ${JAR_FILE} kw1.jar
+COPY --from=build ${JAR_FILE} nw1.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar","kw1.jar"]
+ENTRYPOINT ["java", "-jar","nw1.jar"]
