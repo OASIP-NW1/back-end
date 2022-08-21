@@ -22,7 +22,7 @@ public class EventCategoryDTO {
 
     private Integer eventDuration;
 
-    public String getCategoryName() {
-        return eventCategoryName;
-    }
+//    public String getCategoryName() {
+//        return eventCategoryName;
+//    }
 }

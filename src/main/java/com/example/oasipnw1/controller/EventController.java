@@ -2,6 +2,8 @@ package com.example.oasipnw1.controller;
 
 import com.example.oasipnw1.dtos.EventDTO;
 import com.example.oasipnw1.dtos.EventPageDTO;
+import com.example.oasipnw1.dtos.EventUpdateDTO;
+import com.example.oasipnw1.dtos.UserUpdateDTO;
 import com.example.oasipnw1.entites.Event;
 import com.example.oasipnw1.repository.EventRepository;
 import com.example.oasipnw1.services.EventService;
@@ -55,26 +57,29 @@ public class EventController {
         eventRepository.deleteById(id);
     }
 
+//    @PutMapping("/{id}")
+//    @ResponseStatus(code = HttpStatus.OK)
+//    public void update(@Valid @RequestBody Event updateEvent,
+//                       @PathVariable Integer id) {
+//        Event event = eventRepository.findById(id)
+//                .map(o -> mapEvent(o, updateEvent))
+//                .orElseGet(() -> {
+//                    updateEvent.setId(id);
+//                    return updateEvent;
+//                });
+//        eventService.save (event);
+//    }
+
     @PutMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
-    public void update(@Valid @RequestBody Event updateEvent,
-                       @PathVariable Integer id) {
-        Event event = eventRepository.findById(id)
-                .map(o -> mapEvent(o, updateEvent))
-                .orElseGet(() -> {
-                    updateEvent.setId(id);
-                    return updateEvent;
-                });
-        eventService.save (event);
+    public EventUpdateDTO updateEvent(@Valid @RequestBody EventUpdateDTO updateEvent,
+                                @PathVariable Integer id) {
+        return eventService.updateEvent(updateEvent,id);
     }
 
-    private Event mapEvent(Event existingEvent , Event updateEvent){
-        existingEvent.setBookingEmail(updateEvent.getBookingEmail());
-        existingEvent.setEventCategory(updateEvent.getEventCategory());
-        existingEvent.setBookingName(updateEvent.getBookingName());
-        existingEvent.setEventDuration(updateEvent.getEventDuration());
-        existingEvent.setEventStartTime(updateEvent.getEventStartTime());
-        existingEvent.setEventNote(updateEvent.getEventNote());
-        return existingEvent;
-    }
+//    private Event mapEvent(Event existingEvent , Event updateEvent){
+//        existingEvent.setEventStartTime(updateEvent.getEventStartTime());
+//        existingEvent.setEventNote(updateEvent.getEventNote());
+//        return existingEvent;
+//    }
 }

@@ -2,7 +2,10 @@ package com.example.oasipnw1.services;
 
 import com.example.oasipnw1.dtos.EventDTO;
 import com.example.oasipnw1.dtos.EventPageDTO;
+import com.example.oasipnw1.dtos.EventUpdateDTO;
+import com.example.oasipnw1.dtos.UserUpdateDTO;
 import com.example.oasipnw1.entites.Event;
+import com.example.oasipnw1.entites.User;
 import com.example.oasipnw1.repository.EventRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,5 +85,17 @@ public class EventService  {
         return modelMapper.map(repository.findAll(
                         PageRequest.of(page, pageSize, sort.descending())),
                 EventPageDTO.class);
+
+    }
+
+    public EventUpdateDTO updateEvent(EventUpdateDTO updateEvent, Integer id) {
+        Event event = repository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, id + "does not exist!!!"));
+
+        event.setEventStartTime(updateEvent.getEventStartTime());
+        event.setEventNote(updateEvent.getEventNote());
+        repository.saveAndFlush(event);
+        return updateEvent;
+
     }
 }
