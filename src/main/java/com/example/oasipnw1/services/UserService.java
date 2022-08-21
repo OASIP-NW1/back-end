@@ -6,6 +6,7 @@ import com.example.oasipnw1.dtos.UserDTO;
 import com.example.oasipnw1.dtos.UserUpdateDTO;
 import com.example.oasipnw1.entites.User;
 import com.example.oasipnw1.repository.UserRepository;
+import net.minidev.json.JSONUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -89,7 +90,6 @@ public class UserService {
         }
         return true;
     }
-
     public boolean checkUniqueCreate (UserCreateDTO user){
         List<User> allUser = userRepository.findAll();
         for(User users : allUser){
