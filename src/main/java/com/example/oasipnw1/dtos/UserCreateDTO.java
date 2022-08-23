@@ -27,4 +27,6 @@ public class UserCreateDTO {
     @Enumerated()
     private Role role = Role.student;
 
+    private String password;
+
 }

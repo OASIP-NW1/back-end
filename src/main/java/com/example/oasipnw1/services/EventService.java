@@ -91,7 +91,6 @@ public class EventService  {
     public EventUpdateDTO updateEvent(EventUpdateDTO updateEvent, Integer id) {
         Event event = repository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, id + "does not exist!!!"));
-
         event.setEventStartTime(updateEvent.getEventStartTime());
         event.setEventNote(updateEvent.getEventNote());
         repository.saveAndFlush(event);

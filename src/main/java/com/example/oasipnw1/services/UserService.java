@@ -3,6 +3,7 @@ package com.example.oasipnw1.services;
 import com.example.oasipnw1.Role;
 import com.example.oasipnw1.dtos.UserCreateDTO;
 import com.example.oasipnw1.dtos.UserDTO;
+import com.example.oasipnw1.dtos.UserLoginDTO;
 import com.example.oasipnw1.dtos.UserUpdateDTO;
 import com.example.oasipnw1.entites.User;
 import com.example.oasipnw1.repository.UserRepository;
@@ -11,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -26,6 +28,9 @@ public class UserService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private Argon2PasswordEncoder argon2PasswordEncoder;
 
     public List<UserDTO> getAllUser() {
         List<User> userList = userRepository.findAll((Sort.by("name").ascending()));
@@ -50,6 +55,8 @@ public class UserService {
         if(checkUniqueCreate(newUser)){
             addUserList.setRole(newUser.getRole() == null ? Role.student : newUser.getRole());
         }
+        // Argon2PasswordEncoder : Add Password
+        addUserList.setPassword(argon2PasswordEncoder.encode(addUserList.getPassword()));
         return userRepository.saveAndFlush(addUserList);
     }
 
