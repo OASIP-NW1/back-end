@@ -20,7 +20,7 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    public UserService userService;
 
     @Autowired
     private UserRepository userRepository;
