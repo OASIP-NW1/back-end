@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.ZonedDateTime;
 
 @Setter
@@ -30,7 +32,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role = Role.student;
 
+
     @Column(name = "password", nullable = false , length = 14)
+//    @Size(min = 8 , max = 14 , message = "Password must be between 8 - 14 characters.")
+//    @NotNull(message = "Password is not null")
     private String password;
 
     @Column(name = "createdOn",insertable = false)

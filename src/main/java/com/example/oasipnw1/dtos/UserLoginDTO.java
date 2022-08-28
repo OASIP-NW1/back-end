@@ -10,6 +10,7 @@ import javax.validation.constraints.Email;
 public class UserLoginDTO {
 
     private String name;
+
     private String password;
 
     @Email(message = "invalid email format")

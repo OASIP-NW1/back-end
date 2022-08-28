@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Getter
@@ -27,6 +28,8 @@ public class UserCreateDTO {
     @Enumerated()
     private Role role = Role.student;
 
+    @Size(min = 8 , max = 14 , message = "Password must be between 8 - 14 characters.")
+    @NotNull(message = "Please input the password")
     private String password;
 
 }
