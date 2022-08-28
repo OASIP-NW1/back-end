@@ -25,12 +25,4 @@ public class UserUpdateDTO {
     private String email;
 
     private Role role;
-
-//    public UserUpdateDTO(int id , String name , String email , Role role){
-//        this.id = id;
-//        this.name = name;
-//        this.email = email;
-//        this.role = role;
-//    }
-
 }
