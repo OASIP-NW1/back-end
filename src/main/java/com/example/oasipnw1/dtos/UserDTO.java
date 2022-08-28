@@ -33,6 +33,8 @@ public class UserDTO {
 
     private Role role = Role.student;
 
+    private String password;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private ZonedDateTime createdOn;
 

@@ -3,6 +3,7 @@ package com.example.oasipnw1.services;
 import com.example.oasipnw1.Role;
 import com.example.oasipnw1.dtos.UserCreateDTO;
 import com.example.oasipnw1.dtos.UserDTO;
+import com.example.oasipnw1.dtos.UserLoginDTO;
 import com.example.oasipnw1.dtos.UserUpdateDTO;
 import com.example.oasipnw1.entites.User;
 import com.example.oasipnw1.repository.UserRepository;
@@ -11,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -26,6 +28,11 @@ public class UserService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+//    @Autowired
+//    private UserService userService;
+    @Autowired
+    private Argon2PasswordEncoder argon2PasswordEncoder;
 
     public List<UserDTO> getAllUser() {
         List<User> userList = userRepository.findAll((Sort.by("name").ascending()));
@@ -47,29 +54,31 @@ public class UserService {
         addUserList.setEmail(newUser.getEmail().trim());
 
         //  Check Validtion Unique Create (name email role)
-        if(checkUniqueCreate(newUser)){
+        if (checkUniqueCreate(newUser)) {
             addUserList.setRole(newUser.getRole() == null ? Role.student : newUser.getRole());
         }
+        // Argon2PasswordEncoder : Add Password
+        addUserList.setPassword(argon2PasswordEncoder.encode(addUserList.getPassword()));
         return userRepository.saveAndFlush(addUserList);
     }
 
-    public UserUpdateDTO updateUser(UserUpdateDTO updateUser, Integer id){
-        User user = userRepository.findById(id).orElseThrow(()->
+    public UserUpdateDTO updateUser(UserUpdateDTO updateUser, Integer id) {
+        User user = userRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, id + "does not exist!!!"));
 //        user.setName(updateUser.getName().trim());
 //        user.setEmail(updateUser.getEmail().trim());
 
 //       Check Update Role
-        if(updateUser.getRole()==null){
+        if (updateUser.getRole() == null) {
             updateUser.setRole(user.getRole());
-        }else if(!(user.getRole().equals(updateUser.getRole()))){
+        } else if (!(user.getRole().equals(updateUser.getRole()))) {
             user.setRole(updateUser.getRole());
         }
 //        userRepository.saveAndFlush(user);
 //        return updateUser;
 
 //        Check Validtion Unique Update (name email role)
-        if(checkUniqueUpdate(updateUser , id)){
+        if (checkUniqueUpdate(updateUser, id)) {
             user.setName(updateUser.getName().trim());
             user.setEmail(updateUser.getEmail().trim());
             user.setRole((updateUser.getRole() == null) ? user.getRole() : updateUser.getRole());
@@ -78,28 +87,42 @@ public class UserService {
         return updateUser;
     }
 
-    public boolean checkUniqueUpdate (UserUpdateDTO user ,Integer id){
+    public boolean checkUniqueUpdate(UserUpdateDTO user, Integer id) {
         List<User> allUser = userRepository.findAll();
-        for(User users : allUser){
-            if(!(users.getId() == id)){
-                if(users.getName().trim().equals(user.getName().trim())){
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST , "This name is already used");
-                }else if (users.getEmail().trim().equals(user.getEmail().trim())){
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST , "This email is already used");
+        for (User users : allUser) {
+            if (!(users.getId() == id)) {
+                if (users.getName().trim().equals(user.getName().trim())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This name is already used");
+                } else if (users.getEmail().trim().equals(user.getEmail().trim())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This email is already used");
                 }
             }
         }
         return true;
     }
-    public boolean checkUniqueCreate (UserCreateDTO user){
+
+    public boolean checkUniqueCreate(UserCreateDTO user) {
         List<User> allUser = userRepository.findAll();
-        for(User users : allUser){
-            if(users.getName().trim().equals(user.getName().trim())){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST , "This name is already used");
-            }else if (users.getEmail().trim().equals(user.getEmail().trim())){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST , "This email is already used");
+        for (User users : allUser) {
+            if (users.getName().trim().equals(user.getName().trim())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This name is already used");
+            } else if (users.getEmail().trim().equals(user.getEmail().trim())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This email is already used");
             }
         }
         return true;
+    }
+
+    public UserLoginDTO loginDTO(UserLoginDTO userLogin) {
+        if (userRepository.existsByEmail(userLogin.getEmail())) {
+            User user = userRepository.findByEmail(userLogin.getEmail());
+            if (argon2PasswordEncoder.matches(userLogin.getPassword(), user.getPassword())) {
+                throw new ResponseStatusException(HttpStatus.OK, "Password Matched");
+            } else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Password NOT Matched");
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A user with the specified email DOES NOT exist");
+        }
     }
 }

@@ -30,15 +30,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role = Role.student;
 
-//    @JsonInclude(JsonInclude.Include.NON_NULL)
-//    @Column(name = "createdOn",nullable = false)
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-//    private ZonedDateTime createdOn;
-//
-//    @JsonInclude(JsonInclude.Include.NON_NULL)
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-//    @Column(name = "updatedOn",nullable = false , updatable = false)
-//    private ZonedDateTime updatedOn;
+    @Column(name = "password", nullable = false , length = 14)
+    private String password;
 
     @Column(name = "createdOn",insertable = false)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
