@@ -10,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 
 @Setter
 @Getter
@@ -45,4 +46,5 @@ public class User {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "updatedOn",insertable = false,updatable = false)
     private ZonedDateTime updatedOn;
+
 }
