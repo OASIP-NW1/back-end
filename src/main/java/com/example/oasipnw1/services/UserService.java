@@ -1,17 +1,24 @@
 package com.example.oasipnw1.services;
 
 import com.example.oasipnw1.Role;
+import com.example.oasipnw1.config.JwtTokenUtil;
 import com.example.oasipnw1.dtos.UserCreateDTO;
 import com.example.oasipnw1.dtos.UserDTO;
 import com.example.oasipnw1.dtos.UserLoginDTO;
 import com.example.oasipnw1.dtos.UserUpdateDTO;
 import com.example.oasipnw1.entites.User;
+import com.example.oasipnw1.model.JwtResponse;
 import com.example.oasipnw1.repository.UserRepository;
-import net.minidev.json.JSONUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -28,6 +35,9 @@ public class UserService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
 //    @Autowired
 //    private UserService userService;
@@ -113,16 +123,42 @@ public class UserService {
         return true;
     }
 
-    public UserLoginDTO loginDTO(UserLoginDTO userLogin) {
-        if (userRepository.existsByEmail(userLogin.getEmail())) {
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private JwtUserDetailsService userDetailsService;
+
+    public ResponseEntity loginDTO(UserLoginDTO userLogin) throws  Exception {
+            if (userRepository.existsByEmail(userLogin.getEmail())) {
             User user = userRepository.findByEmail(userLogin.getEmail());
             if (argon2PasswordEncoder.matches(userLogin.getPassword(), user.getPassword())) {
-                throw new ResponseStatusException(HttpStatus.OK, "Password Matched");
+                authenticate(userLogin.getEmail() , userLogin.getPassword());
+                authenticate(userLogin.getEmail(), userLogin.getPassword());
+
+                final UserDetails userDetails = userDetailsService
+                        .loadUserByUsername(userLogin.getEmail());
+
+                final String token = jwtTokenUtil.generateToken(userDetails);
+
+//                return ResponseEntity.ok(new JwtResponse(token));
+                return ResponseEntity.ok(new JwtResponse(token));
+//                throw new ResponseStatusException(HttpStatus.OK, "Password Matched");
             } else {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Password NOT Matched");
             }
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A user with the specified email DOES NOT exist");
+        }
+    }
+
+    private void authenticate(String email, String password) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+        } catch (DisabledException e) {
+            throw new Exception("USER_DISABLED", e);
+        } catch (BadCredentialsException e) {
+            throw new Exception("INVALID_CREDENTIALS", e);
         }
     }
 }

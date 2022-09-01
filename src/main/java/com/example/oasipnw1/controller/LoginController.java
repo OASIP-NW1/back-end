@@ -1,22 +1,19 @@
 package com.example.oasipnw1.controller;
 
-import com.example.oasipnw1.dtos.UserCreateDTO;
 import com.example.oasipnw1.dtos.UserLoginDTO;
-import com.example.oasipnw1.entites.User;
 import com.example.oasipnw1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.validation.Valid;
 
-
-@RestController
 @RequestMapping("/api/login")
-//@RequestMapping("/api/match")
-public class UserLoginController {
-
+public class LoginController {
     @Autowired
     private UserService userService;
 
@@ -26,5 +23,4 @@ public class UserLoginController {
             (@Valid @RequestBody UserLoginDTO userLogin) throws Exception{
         return userService.loginDTO(userLogin);
     }
-
 }
