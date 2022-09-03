@@ -1,5 +1,7 @@
 package com.example.oasipnw1.services;
 
+import com.example.oasipnw1.CustomResponseExceptionHandler;
+import com.example.oasipnw1.HandleValidationErrors;
 import com.example.oasipnw1.Role;
 import com.example.oasipnw1.config.JwtTokenUtil;
 import com.example.oasipnw1.dtos.UserCreateDTO;
@@ -9,9 +11,11 @@ import com.example.oasipnw1.dtos.UserUpdateDTO;
 import com.example.oasipnw1.entites.User;
 import com.example.oasipnw1.model.JwtResponse;
 import com.example.oasipnw1.repository.UserRepository;
+import org.apache.catalina.filters.ExpiresFilter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,9 +25,20 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
+import com.example.oasipnw1.HandleValidationErrors;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.sql.Date;
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserService {
@@ -129,11 +144,14 @@ public class UserService {
     @Autowired
     private JwtUserDetailsService userDetailsService;
 
-    public ResponseEntity loginDTO(UserLoginDTO userLogin) throws  Exception {
-            if (userRepository.existsByEmail(userLogin.getEmail())) {
+    public ResponseEntity loginDTO(@Valid UserLoginDTO userLogin, HttpServletResponse httpServletResponse, ServletWebRequest request) throws Exception {
+        Map<String,String> errorMap = new HashMap<>();
+        String status;
+
+        if (userRepository.existsByEmail(userLogin.getEmail())) {
             User user = userRepository.findByEmail(userLogin.getEmail());
             if (argon2PasswordEncoder.matches(userLogin.getPassword(), user.getPassword())) {
-                authenticate(userLogin.getEmail() , userLogin.getPassword());
+                authenticate(userLogin.getEmail(), userLogin.getPassword());
                 authenticate(userLogin.getEmail(), userLogin.getPassword());
 
                 final UserDetails userDetails = userDetailsService
@@ -141,24 +159,38 @@ public class UserService {
 
                 final String token = jwtTokenUtil.generateToken(userDetails);
 
-//                return ResponseEntity.ok(new JwtResponse(token));
                 return ResponseEntity.ok(new JwtResponse(token));
 //                throw new ResponseStatusException(HttpStatus.OK, "Password Matched");
             } else {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Password NOT Matched");
+                errorMap.put("message","Password NOT Matched");
+                httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                status = HttpStatus.UNAUTHORIZED.toString();
+//            }
+
             }
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A user with the specified email DOES NOT exist");
-        }
+        }else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A user with the specified email DOES NOT exist");
     }
 
-    private void authenticate(String email, String password) throws Exception {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-        } catch (DisabledException e) {
-            throw new Exception("USER_DISABLED", e);
-        } catch (BadCredentialsException e) {
-            throw new Exception("INVALID_CREDENTIALS", e);
+        HandleValidationErrors errors = new HandleValidationErrors(
+                Date.from(Instant.now()),
+                httpServletResponse.getStatus(),
+                request.getRequest().getRequestURI(),
+                status,
+                errorMap.get("message"));
+        return ResponseEntity.status(httpServletResponse.getStatus()).body(errors);
+
+}
+
+
+        private void authenticate(String email, String password) throws Exception {
+            try {
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+            } catch (DisabledException e) {
+                throw new Exception("USER_DISABLED", e);
+            } catch (BadCredentialsException e) {
+                throw new Exception("INVALID_CREDENTIALS", e);
+            }
         }
-    }
+
 }

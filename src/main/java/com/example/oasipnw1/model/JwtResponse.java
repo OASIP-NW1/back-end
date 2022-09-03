@@ -13,5 +13,4 @@ public class JwtResponse {
 //    private static  long serialVersionUID = -8091879091924046844L;
     private String jwtToken;
 
-
 }

@@ -7,12 +7,14 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 
 
@@ -21,8 +23,8 @@ public class CustomResponseExceptionHandler extends ResponseEntityExceptionHandl
     @ExceptionHandler(ConstraintViolationException.class)
     public void constraintViolationException(HttpServletResponse httpServletResponse) throws IOException {
         httpServletResponse.sendError(HttpStatus.BAD_REQUEST.value());
+        httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value());
     }
-
     //    error handle for @valid -> sprint boot starter validation -> in entities
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
@@ -42,7 +44,25 @@ public class CustomResponseExceptionHandler extends ResponseEntityExceptionHandl
             String errorMes = error.getDefaultMessage();
             errors.put(Name , errorMes);
         });
+
         details.put("errors" , errors);
         return new ResponseEntity<>(details,headers,status);
     }
+
+//    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+//                                                                  HttpHeaders headers, HttpStatus status, WebRequest request) {
+//
+//        Map<String, Object> errors = new HashMap<>();
+//        errors.put("TIMESTAMP", Instant.now());
+//        errors.put("status", status.value());
+//        errors.put("error", "Validate failed");
+//        Map<String, String> errorField = new HashMap<>();
+//        ex.getBindingResult().getAllErrors().forEach((error) ->{
+//            String fieldName = ((FieldError) error).getField();
+//            String message = error.getDefaultMessage();
+//            errorField.put(fieldName, message);
+//        });
+//        errors.put("message",errorField);
+//        return new ResponseEntity<Object>(errors, HttpStatus.BAD_REQUEST);
+//    }
 }
