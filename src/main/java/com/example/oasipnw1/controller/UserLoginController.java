@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.ServletWebRequest;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 
@@ -23,8 +25,8 @@ public class UserLoginController {
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity loginDTO
-            (@Valid @RequestBody UserLoginDTO userLogin) throws Exception{
-        return userService.loginDTO(userLogin);
+            (@Valid @RequestBody UserLoginDTO userLogin, HttpServletResponse httpServletResponse, ServletWebRequest request) throws Exception{
+        return userService.loginDTO(userLogin,httpServletResponse,request);
     }
 
 }

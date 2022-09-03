@@ -15,13 +15,13 @@ import javax.validation.constraints.Size;
 public class UserCreateDTO {
 
     private Integer id;
+
     @NotBlank(message = "name can't be blank")
     @Size(max = 100, message = "booking name must be between 0-100 characters")
     private String name;
 
     @NotBlank(message = "booking-email can't be blank")
     @Size(max = 50 , message = "booking-email must be between 0-50 characters")
-
     @Email(message = "invalid email format")
     private String email;
 
