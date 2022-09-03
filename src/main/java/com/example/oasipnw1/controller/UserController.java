@@ -35,8 +35,8 @@ public class UserController {
         return userService.getUserById(id);
     }
 
-    @PostMapping("")
-    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/signup")
+    @ResponseStatus(HttpStatus.OK)
     public User create(@Valid @RequestBody UserCreateDTO newUser) {
         return userService.save(newUser);
     }

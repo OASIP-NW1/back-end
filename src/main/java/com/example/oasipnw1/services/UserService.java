@@ -145,7 +145,8 @@ public class UserService {
                 return ResponseEntity.ok(new JwtResponse(token));
 //                throw new ResponseStatusException(HttpStatus.OK, "Password Matched");
             } else {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Password NOT Matched");
+              return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Password NOT Matched");
+//                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Password NOT Matched");
             }
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A user with the specified email DOES NOT exist");
