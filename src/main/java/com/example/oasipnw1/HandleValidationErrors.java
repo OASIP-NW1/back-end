@@ -13,7 +13,7 @@ import java.util.Date;
 public class HandleValidationErrors {
     private Date timestamp = new Date();
     private Integer status;
+    private String error;
     private String message;
     private String path;
-    private String error;
 }

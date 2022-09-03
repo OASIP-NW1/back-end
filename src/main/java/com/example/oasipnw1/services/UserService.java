@@ -175,9 +175,9 @@ public class UserService {
         HandleValidationErrors errors = new HandleValidationErrors(
                 Date.from(Instant.now()),
                 httpServletResponse.getStatus(),
-                request.getRequest().getRequestURI(),
                 status,
-                errorMap.get("message"));
+                errorMap.get("message"),
+                request.getRequest().getRequestURI());
         return ResponseEntity.status(httpServletResponse.getStatus()).body(errors);
 
 }
