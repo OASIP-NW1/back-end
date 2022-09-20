@@ -29,7 +29,7 @@ public class RefreshService {
         String refreshToken = jwtTokenUtill.generateRefreshToken(userDetails);
 //            String getRefreshTokenExpire = jwtTokenUtill.getExpirationDateFromToken(u)
         if (checkExpired(requestRefreshToken).equals(true)) {
-            return ResponseEntity.ok(new JwtResponse());
+            return ResponseEntity.ok(new JwtResponse("Refresh Token Success",accessToken,refreshToken));
         }
         return Response.response(HttpStatus.NOT_FOUND, "Can't find Refresh Token");
     }

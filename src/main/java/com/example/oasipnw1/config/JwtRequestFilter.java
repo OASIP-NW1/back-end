@@ -46,11 +46,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
                 System.out.println("Unable to get JWT Token");
+                request.setAttribute("Errors",e.getMessage());
             } catch (ExpiredJwtException e) {
                 System.out.println("JWT Token has expired");
+                request.setAttribute("Errors",e.getMessage());
             }
         } else {
             logger.warn("JWT Token does not begin with Bearer String");
+            request.setAttribute("Errors","Token does not exist");
         }
 
         // Once we get the token validate it.

@@ -54,7 +54,7 @@ public class UserService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-//    @Autowired
+    //    @Autowired
 //    private UserService userService;
     @Autowired
     private Argon2PasswordEncoder argon2PasswordEncoder;
@@ -159,7 +159,8 @@ public class UserService {
 
                 final String token = jwtTokenUtil.generateToken(userDetails);
 
-                return ResponseEntity.ok(new JwtResponse());
+                final String refreshToken = jwtTokenUtil.generateRefreshToken(userDetails);
+                return ResponseEntity.ok(new JwtResponse("Login Success",token,refreshToken));
 //                throw new ResponseStatusException(HttpStatus.OK, "Password Matched");
             } else {
                 errorMap.put("message","Password NOT Matched");
