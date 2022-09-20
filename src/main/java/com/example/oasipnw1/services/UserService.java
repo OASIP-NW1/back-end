@@ -159,7 +159,7 @@ public class UserService {
 
                 final String token = jwtTokenUtil.generateToken(userDetails);
 
-                return ResponseEntity.ok(new JwtResponse(token));
+                return ResponseEntity.ok(new JwtResponse());
 //                throw new ResponseStatusException(HttpStatus.OK, "Password Matched");
             } else {
                 errorMap.put("message","Password NOT Matched");
