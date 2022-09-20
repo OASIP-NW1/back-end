@@ -169,8 +169,8 @@ public class UserService {
 
             }
         }else {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A user with the specified email DOES NOT exist");
-    }
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A user with the specified email DOES NOT exist");
+        }
 
         HandleValidationErrors errors = new HandleValidationErrors(
                 Date.from(Instant.now()),
@@ -180,17 +180,17 @@ public class UserService {
                 request.getRequest().getRequestURI());
         return ResponseEntity.status(httpServletResponse.getStatus()).body(errors);
 
-}
+    }
 
 
-        private void authenticate(String email, String password) throws Exception {
-            try {
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-            } catch (DisabledException e) {
-                throw new Exception("USER_DISABLED", e);
-            } catch (BadCredentialsException e) {
-                throw new Exception("INVALID_CREDENTIALS", e);
-            }
+    private void authenticate(String email, String password) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+        } catch (DisabledException e) {
+            throw new Exception("USER_DISABLED", e);
+        } catch (BadCredentialsException e) {
+            throw new Exception("INVALID_CREDENTIALS", e);
         }
+    }
 
 }
