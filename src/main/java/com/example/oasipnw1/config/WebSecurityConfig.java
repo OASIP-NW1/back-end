@@ -1,5 +1,6 @@
 package com.example.oasipnw1.config;
 
+import com.example.oasipnw1.customException.CustomAccessDeniedHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -50,19 +52,39 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.cors().and().csrf().disable()
+                .exceptionHandling().authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                .accessDeniedHandler(accessDeniedHandler())
+                .and()
+//                .exceptionHandling().accessDeniedHandler(new JwtAccessDenied()).and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .authorizeRequests().antMatchers("/api/login").permitAll()
+                .antMatchers("/api/users/signup").permitAll()
+                .antMatchers("/api/users/**","/api/events/**","/api/match/**").hasRole("admin")
+                .antMatchers("/api/events/**").hasRole("student")
+//                .antMatchers("/api/events/**").hasRole()
+//                .antMatchers("/api/refresh").permitAll()
+                .anyRequest().authenticated();
+                httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
         // We don't need CSRF for this example
-        httpSecurity.csrf().disable()
+//        httpSecurity.csrf().disable()
                 // dont authenticate this particular request
 //                การดักเข้าได้เฉพาะ login
-                .authorizeRequests().antMatchers("/api/login","/api/users/signup").permitAll().
+//                .authorizeRequests().antMatchers("/api/login","/api/users/signup").permitAll().
                 // all other requests need to be authenticated
-                        anyRequest().authenticated().and().
+//                        anyRequest().authenticated().and().
                 // make sure we use stateless session; session won't be used to
                 // store user's state.
-                        exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+//                        exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         // Add a filter to validate the tokens with every request
-        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+//        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
     }
 }

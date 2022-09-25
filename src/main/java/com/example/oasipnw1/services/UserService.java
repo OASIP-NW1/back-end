@@ -1,6 +1,6 @@
 package com.example.oasipnw1.services;
 
-import com.example.oasipnw1.CustomResponseExceptionHandler;
+
 import com.example.oasipnw1.HandleValidationErrors;
 import com.example.oasipnw1.Role;
 import com.example.oasipnw1.config.JwtTokenUtil;
@@ -11,11 +11,9 @@ import com.example.oasipnw1.dtos.UserUpdateDTO;
 import com.example.oasipnw1.entites.User;
 import com.example.oasipnw1.model.JwtResponse;
 import com.example.oasipnw1.repository.UserRepository;
-import org.apache.catalina.filters.ExpiresFilter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,13 +23,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.request.ServletWebRequest;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
-import com.example.oasipnw1.HandleValidationErrors;
 
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.sql.Date;
@@ -54,8 +48,6 @@ public class UserService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    //    @Autowired
-//    private UserService userService;
     @Autowired
     private Argon2PasswordEncoder argon2PasswordEncoder;
 
@@ -167,7 +159,6 @@ public class UserService {
                 httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 status = HttpStatus.UNAUTHORIZED.toString();
 //            }
-
             }
         }else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A user with the specified email DOES NOT exist");
@@ -182,7 +173,6 @@ public class UserService {
         return ResponseEntity.status(httpServletResponse.getStatus()).body(errors);
 
     }
-
 
     private void authenticate(String email, String password) throws Exception {
         try {
