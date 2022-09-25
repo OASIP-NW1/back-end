@@ -52,31 +52,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests().antMatchers("/api/login").permitAll()
                 .antMatchers("/api/users/signup").permitAll()
-                .antMatchers("/api/users/** ,/api/match/**").hasRole("admin")
-                .antMatchers("/api/events/**").hasRole("admin")
-                .antMatchers("/api/events/**").hasRole("student")
-//                .antMatchers("/api/events/**").hasRole()
+                .antMatchers("/api/users/**","/api/match/**").hasRole("admin")
+//                .antMatchers("/api/events/**").hasRole("student")
+//                .antMatchers("/api/events/**").access("hasRole('admin') or hasRole('student')")
 //                .antMatchers("/api/refresh").permitAll()
                 .anyRequest().authenticated();
-                httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-
-        // We don't need CSRF for this example
-//        httpSecurity.csrf().disable()
-                // dont authenticate this particular request
-//                การดักเข้าได้เฉพาะ login
-//                .authorizeRequests().antMatchers("/api/login" , "/api/users/signup").permitAll().
-
-//                .authorizeRequests().antMatchers("/api/login","/api/users/signup").permitAll().
-
-                // all other requests need to be authenticated
-//                        anyRequest().authenticated().and().
-                // make sure we use stateless session; session won't be used to
-                // store user's state.
-//                        exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-        // Add a filter to validate the tokens with every request
-//        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 //
 //        //method we'll configure patterns to define protected/unprotected API endpoints. Please note that we have disabled CSRF protection because we are not using Cookies.
 //
@@ -106,7 +87,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler(){
-
         return new CustomAccessDeniedHandler();
     }
 
