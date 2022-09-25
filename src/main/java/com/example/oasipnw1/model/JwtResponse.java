@@ -2,6 +2,7 @@ package com.example.oasipnw1.model;
 
 import lombok.*;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Setter
@@ -10,7 +11,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Data
 public class JwtResponse {
-//    private static  long serialVersionUID = -8091879091924046844L;
-    private String jwtToken;
-
+//    private String jwtToken;
+    private String message;
+    private String accessToken;
+    private String refreshToken;
 }

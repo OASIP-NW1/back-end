@@ -49,20 +49,4 @@ public class CustomResponseExceptionHandler extends ResponseEntityExceptionHandl
         return new ResponseEntity<>(details,headers,status);
     }
 
-//    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-//                                                                  HttpHeaders headers, HttpStatus status, WebRequest request) {
-//
-//        Map<String, Object> errors = new HashMap<>();
-//        errors.put("TIMESTAMP", Instant.now());
-//        errors.put("status", status.value());
-//        errors.put("error", "Validate failed");
-//        Map<String, String> errorField = new HashMap<>();
-//        ex.getBindingResult().getAllErrors().forEach((error) ->{
-//            String fieldName = ((FieldError) error).getField();
-//            String message = error.getDefaultMessage();
-//            errorField.put(fieldName, message);
-//        });
-//        errors.put("message",errorField);
-//        return new ResponseEntity<Object>(errors, HttpStatus.BAD_REQUEST);
-//    }
 }

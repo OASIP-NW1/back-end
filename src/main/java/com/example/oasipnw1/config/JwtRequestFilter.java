@@ -2,12 +2,15 @@ package com.example.oasipnw1.config;
 
 import com.example.oasipnw1.services.JwtUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -33,19 +36,24 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         String username = null;
         String jwtToken = null;
+
         // JWT Token is in the form "Bearer token". Remove Bearer word and get
         // only the Token
+
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
                 System.out.println("Unable to get JWT Token");
+                request.setAttribute("Errors",e.getMessage());
             } catch (ExpiredJwtException e) {
                 System.out.println("JWT Token has expired");
+                request.setAttribute("Errors",e.getMessage());
             }
         } else {
             logger.warn("JWT Token does not begin with Bearer String");
+            request.setAttribute("Errors","Token does not exist");
         }
 
         // Once we get the token validate it.
