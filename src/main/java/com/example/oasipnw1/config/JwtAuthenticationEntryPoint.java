@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.impl.DefaultClaims;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -46,4 +48,5 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint{
             throw new ServletException();
         }
     }
+
 }

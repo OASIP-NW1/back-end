@@ -20,7 +20,6 @@ public class RefreshService {
         this.jwtUserDetailsService = jwtUserDetailsService;
     }
 
-
     public ResponseEntity refreshToken(HttpServletRequest request){
         String requestRefreshToken = request.getHeader("Authorization").substring(7);
         String userRefreshToken = jwtTokenUtill.getUsernameFromToken(requestRefreshToken);
