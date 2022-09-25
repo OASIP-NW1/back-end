@@ -52,9 +52,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests().antMatchers("/api/login").permitAll()
                 .antMatchers("/api/users/signup").permitAll()
-                .antMatchers("/api/users/**","/api/events/**","/api/match/**").hasRole("admin")
-                .antMatchers("/api/events/**").hasRole("student")
-//                .antMatchers("/api/events/**").hasRole()
+                .antMatchers("/api/users/**","/api/match/**").hasRole("admin")
+//                .antMatchers("/api/events/**").hasRole("student")
+                .antMatchers("/api/events/**").access("hasRole('admin') or hasRole('student')")
 //                .antMatchers("/api/refresh").permitAll()
                 .anyRequest().authenticated();
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
@@ -87,7 +87,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler(){
-
         return new CustomAccessDeniedHandler();
     }
 
