@@ -23,10 +23,9 @@ import java.util.stream.Collectors;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
-    @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+
+    private final JwtUserDetailsService jwtUserDetailsService;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     public JwtRequestFilter(JwtUserDetailsService jwtUserDetailsService, JwtTokenUtil jwtTokenUtil) {
@@ -39,37 +38,42 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         final String requestTokenHeader = request.getHeader("Authorization");
-
         String username = null;
         String jwtToken = null;
-
         // JWT Token is in the form "Bearer token". Remove Bearer word and get
         // only the Token
-
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
                 System.out.println("Unable to get JWT Token");
-                request.setAttribute("Errors",e.getMessage());
             } catch (ExpiredJwtException e) {
-                System.out.println("JWT Token has expired");
-                request.setAttribute("Errors",e.getMessage());
+                String requestURL = request.getRequestURL().toString();
+                System.out.println(requestURL);
+                if(requestURL.contains("refresh")){
+                    request.setAttribute("Errors", "Refresh token was expired. Please make a new signin request");
+                }else{
+                    request.setAttribute("Errors", e.getMessage());
+                }
+            }catch (MalformedJwtException e){
+                request.setAttribute("Errors", e.getMessage());
+            }catch (SignatureException e){
+                request.setAttribute("Errors", e.getMessage());
             }
         } else {
             logger.warn("JWT Token does not begin with Bearer String");
-            request.setAttribute("Errors","Token does not exist");
+            request.setAttribute("Errors", "Token doesn't exist");
         }
 
         // Once we get the token validate it.
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
             UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
 
             // if token is valid configure Spring Security to manually set
             // authentication
             if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 String authorities = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining());
