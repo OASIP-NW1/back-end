@@ -1,5 +1,6 @@
 package com.example.oasipnw1.services;
 
+import com.example.oasipnw1.config.JwtTokenUtil;
 import com.example.oasipnw1.dtos.EventDTO;
 import com.example.oasipnw1.dtos.EventPageDTO;
 import com.example.oasipnw1.dtos.EventUpdateDTO;
@@ -12,10 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -32,6 +35,12 @@ public class EventService  {
 
     @Autowired
     private EventRepository repository;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private JwtUserDetailsService jwtuserDetailsService;
 
     public Event save(Event event) {
         ZonedDateTime newEventStartTime = event.getEventStartTime();
@@ -95,6 +104,32 @@ public class EventService  {
         event.setEventNote(updateEvent.getEventNote());
         repository.saveAndFlush(event);
         return updateEvent;
+    }
 
+    public List<EventDTO> getAll(HttpServletRequest request){
+        List<Event> eventsList = repository.findAll(Sort.by(Sort.Direction.DESC,"eventStartTime"));
+        String getUserEmail = getUserEmail(getRequestAccessToken(request));
+        UserDetails userDetails = jwtuserDetailsService.loadUserByUsername(getUserEmail);
+        if(userDetails != null && (request.isUserInRole("ROLE_student"))){
+            List<Event> eventsListByEmail = repository.findByBookingEmail(getUserEmail);
+            return listMapper.mapList(eventsListByEmail, EventDTO.class,modelMapper);
+
+        }
+//        else if(userDetails != null && (request.isUserInRole("ROLE_lecturer"))){
+////            List<Events> eventsListByEmail = repository.findByBookingEmail(getUserEmail);
+//            List<Event> eventsListByCategoryOwner = repository.findEventsCategoryOwnerByEmail(getUserEmail);
+//
+//            return listMapper.mapList(eventsListByCategoryOwner , EventDTO.class,modelMapper);
+//
+//        }
+        return listMapper.mapList(eventsList, EventDTO.class,modelMapper);
+    }
+
+    public String getRequestAccessToken(HttpServletRequest request){
+        return request.getHeader("Authorization").substring(7);
+    }
+
+    public String getUserEmail(String requestAccessToken){
+        return jwtTokenUtil.getUsernameFromToken(requestAccessToken);
     }
 }

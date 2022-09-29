@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -25,8 +26,8 @@ public class EventController {
     private EventRepository eventRepository;
 
     @GetMapping("")
-    public List<EventDTO> getAllSubject(){
-        return eventService.getAllEvent();
+    public List<EventDTO> getAllSubject(HttpServletRequest httpServletRequest){
+        return eventService.getAll(httpServletRequest);
     }
 
     @GetMapping("/{id}")
