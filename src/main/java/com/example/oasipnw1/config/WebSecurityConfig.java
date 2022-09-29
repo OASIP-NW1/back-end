@@ -54,7 +54,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/users/signup").permitAll()
                 .antMatchers("/api/users/**","/api/match/**").hasRole("admin")
 //                .antMatchers("/api/events/**").hasRole("student")
-//                .antMatchers("/api/events/**").access("hasRole('admin') or hasRole('student')")
+                .antMatchers("/api/events/**").hasRole("admin")
+                .antMatchers("/api/events/{id}").hasRole("student")
+//                .antMatchers("api/eventCategory/**").hasRole("lecturer")
 //                .antMatchers("/api/refresh").permitAll()
                 .anyRequest().authenticated();
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
@@ -77,7 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 ////                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 //
 //        // Add a filter to validate the tokens with every request
-//        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override @Bean

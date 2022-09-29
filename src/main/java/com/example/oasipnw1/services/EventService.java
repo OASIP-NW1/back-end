@@ -38,22 +38,22 @@ public class EventService  {
         ZonedDateTime newEventEndTime = findEndDate(event.getEventStartTime(), event.getEventDuration());
         List<EventDTO> eventList = getAllEvent();
 
-//        for (int i = 0; i < eventList.size(); i++) {
-//            ZonedDateTime eventStartTime = eventList.get(i).getEventStartTime();
-//            if(eventStartTime.isEqual(newEventStartTime)){
-//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
-//            }else {
-//                ZonedDateTime eventEndTime = findEndDate(eventList.get(i).getEventStartTime(),
-//                        eventList.get(i).getEventDuration());
-//                if (newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventStartTime) ||
-//                        newEventStartTime.isBefore(eventEndTime) && newEventEndTime.isAfter(eventEndTime) ||
-//                        newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventEndTime) ||
-//                        newEventStartTime.isAfter(eventStartTime) && newEventEndTime.isBefore(eventEndTime)
-//                        || newEventStartTime.equals(eventStartTime)) {
-//                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
-//                }
-//            }
-//        }
+        for (int i = 0; i < eventList.size(); i++) {
+            ZonedDateTime eventStartTime = eventList.get(i).getEventStartTime();
+            if(eventStartTime.isEqual(newEventStartTime)){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
+            }else {
+                ZonedDateTime eventEndTime = findEndDate(eventList.get(i).getEventStartTime(),
+                        eventList.get(i).getEventDuration());
+                if (newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventStartTime) ||
+                        newEventStartTime.isBefore(eventEndTime) && newEventEndTime.isAfter(eventEndTime) ||
+                        newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventEndTime) ||
+                        newEventStartTime.isAfter(eventStartTime) && newEventEndTime.isBefore(eventEndTime)
+                        || newEventStartTime.equals(eventStartTime)) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
+                }
+            }
+        }
         return repository.saveAndFlush(event);
     }
 
