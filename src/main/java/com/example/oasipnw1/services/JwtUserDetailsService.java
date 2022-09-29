@@ -2,7 +2,6 @@ package com.example.oasipnw1.services;
 
 import com.example.oasipnw1.entites.User;
 import com.example.oasipnw1.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +15,6 @@ import java.util.List;
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
-
 
     private final UserRepository repository;
     private final Argon2PasswordEncoder argon2PasswordEncoder;
@@ -39,5 +37,4 @@ public class JwtUserDetailsService implements UserDetailsService {
         authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
         return authorities;
     }
-
 }

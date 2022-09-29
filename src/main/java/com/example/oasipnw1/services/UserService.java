@@ -136,7 +136,9 @@ public class UserService {
     @Autowired
     private JwtUserDetailsService userDetailsService;
 
-    public ResponseEntity loginDTO(@Valid UserLoginDTO userLogin, HttpServletResponse httpServletResponse, ServletWebRequest request) throws Exception {
+    public ResponseEntity loginDTO(@Valid UserLoginDTO userLogin,
+                                   HttpServletResponse httpServletResponse,
+                                   ServletWebRequest request) throws Exception {
         Map<String,String> errorMap = new HashMap<>();
         String status;
 
@@ -171,7 +173,6 @@ public class UserService {
                 errorMap.get("message"),
                 request.getRequest().getRequestURI());
         return ResponseEntity.status(httpServletResponse.getStatus()).body(errors);
-
     }
 
     private void authenticate(String email, String password) throws Exception {
@@ -183,5 +184,4 @@ public class UserService {
             throw new Exception("INVALID_CREDENTIALS", e);
         }
     }
-
 }
