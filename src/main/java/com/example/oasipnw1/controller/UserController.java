@@ -56,5 +56,6 @@ public class UserController {
                         id + " does not exist !!!"));
         userRepository.deleteById(id);
     }
+
 }
 

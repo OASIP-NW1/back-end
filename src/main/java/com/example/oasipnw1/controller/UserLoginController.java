@@ -28,5 +28,4 @@ public class UserLoginController {
             (@Valid @RequestBody UserLoginDTO userLogin, HttpServletResponse httpServletResponse, ServletWebRequest request) throws Exception{
         return userService.loginDTO(userLogin,httpServletResponse,request);
     }
-
 }

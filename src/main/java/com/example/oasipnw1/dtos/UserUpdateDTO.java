@@ -25,4 +25,5 @@ public class UserUpdateDTO {
     private String email;
 
     private Role role;
+
 }
