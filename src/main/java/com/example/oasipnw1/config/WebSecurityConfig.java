@@ -53,18 +53,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/api/login","/api/users/signup").permitAll()
                 .antMatchers("/api/users/**","/api/match/**").hasRole("admin")
-<<<<<<< HEAD
-//                .antMatchers("/api/events/**").hasRole("student")
-                .antMatchers("/api/events/**").hasRole("admin")
-                .antMatchers("/api/events/{id}").hasRole("student")
-//                .antMatchers("api/eventCategory/**").hasRole("lecturer")
-//                .antMatchers("/api/refresh").permitAll()
-=======
                 .antMatchers(HttpMethod.GET, "/api/events","/api/events/{id}").hasAnyRole("admin","student","lecturer")
                 .antMatchers(HttpMethod.POST, "/api/events").hasAnyRole("admin","student","guest")
                 .antMatchers(HttpMethod.PUT, "/api/events/{id}").hasAnyRole("admin","student")
                 .antMatchers(HttpMethod.DELETE, "/api/events/{id}").hasAnyRole("admin","student")
->>>>>>> fe516da694cbe849c0152bf9e947d00f77dd3146
                 .anyRequest().authenticated();
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 //                .antMatchers("/api/events/**").hasRole("student")
@@ -88,13 +80,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                        exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
 //                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 //
-<<<<<<< HEAD
-//        // Add a filter to validate the tokens with every request
-        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-=======
 //        Add a filter to validate the tokens with every request
 //        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
->>>>>>> fe516da694cbe849c0152bf9e947d00f77dd3146
     }
 
     @Override @Bean
