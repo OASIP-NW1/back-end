@@ -35,7 +35,7 @@ public class EventController {
     private EventCategory eventCategory;
     @Autowired
     private EmailSerderService serderService;
-//    public EmailSerderService(EmailSerderService serderService , EventCategoryRepository eventCategoryRepository){
+    //    public EmailSerderService(EmailSerderService serderService , EventCategoryRepository eventCategoryRepository){
 //        this.serderService = serderService;
 //        this.eventRepository = eventCategoryRepository;
 //    }
@@ -108,7 +108,7 @@ public class EventController {
     @PutMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
     public EventUpdateDTO updateEvent(@Valid @RequestBody EventUpdateDTO updateEvent,
-                                @PathVariable Integer id) {
+                                      @PathVariable Integer id) {
         return eventService.updateEvent(updateEvent,id);
 
     }
