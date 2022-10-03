@@ -11,8 +11,8 @@ import javax.validation.constraints.*;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+//@NoArgsConstructor
+//@AllArgsConstructor
 @Entity
 @Service
 @Table(name = "EventCategory")
@@ -25,9 +25,17 @@ public class EventCategory {
     @NotBlank(message = "eventCategoryName cannot be empty")
     @Size(max = 100, message = "eventCategoryName Must not exceed 100 characters.")
     @Column(name = "eventCategoryName", nullable = false)
-    private String eventCategoryName;
+    public String eventCategoryName;
 
     private String eventCategoryDescription;
+
+    public String getEventCategoryNames() {
+        return eventCategoryName;
+    }
+
+    public void setEventCategoryName(String eventCategoryName) {
+        this.eventCategoryName = eventCategoryName;
+    }
 
     @Column(name = "eventDuration", nullable = false)
     private Integer eventDuration;

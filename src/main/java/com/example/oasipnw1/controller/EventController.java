@@ -33,6 +33,7 @@ public class EventController {
 
     @Autowired
     private EventCategory eventCategory;
+
     @Autowired
     private EmailSerderService serderService;
 //    public EmailSerderService(EmailSerderService serderService , EventCategoryRepository eventCategoryRepository){
@@ -60,27 +61,17 @@ public class EventController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("")
     public void Event (@Valid HttpServletRequest request , @Valid @RequestBody Event event) {
-//        ZonedDateTime time = event.getEventStartTime();
-//        String formattedDate = time.format(DateTimeFormatter.ofPattern("dd-MMM-yy-hh-mm"));
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMM-yy-hh-mm");
-//        ZonedDateTime time = event.getEventStartTime();
-//        String formattedDate = time.format(DateTimeFormatter.ofPattern("dd-MMM-yy-hh-mm"));
-//        String header = "You have made a new appointment ." + '\n' ;
-//        String body = "Your booking name : " + event.getBookingName() + '\n' +
-//                "Event category : " + event.getEventCategory().getEventCategoryName() + '\n' +
-//                "Start date and time : " + zonedDateTime.format(event.getEventStartTime())  + '\n' +
-//                "Event duration : " + event.getEventDuration() + "Minutes" + '\n' +
-//                "Event note : " + event.getEventNote();
-//        serderService.sendNotification(event.getBookingEmail(),header , body  );
-//        eventService.save (request,event);
-        ZonedDateTime time = event.getEventStartTime();
-//        String formattedDate = time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        String header = "You have made a new appointment.";
-        String body = "Your appointment has been registered successfully. \n \n" +
-                "Details  \n" + "Name : " + event.getBookingName() + "\n" +"Clinic : " + eventCategory.getEventCategoryName() +
-                "\n" + "Date : " + formatter.format(event.getEventStartTime()) + "Time"+ "\n" + "Note : " + event.getEventNote();
-        serderService.sendNotification(event.getBookingEmail() , header , body);
+        LocalDateTime localDateTime = event.getEventStartTime();
+        System.out.println(event.eventCategoryName());
+        String newformat = localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String header = "You have made a new appointment ." + '\n' ;
+        String body = "Your booking name : " + event.getBookingName() + '\n' +
+                "Event category : " + " " + event.getEventCategory().getEventCategoryName() + '\n' +
+                "Start date and time : " +  " " + newformat + '\n' +
+                "Event duration : " +  " " +event.getEventDuration() + "Minutes" + '\n' +
+                "Event note : " +  " " +event.getEventNote();
+        serderService.sendNotification(event.getBookingEmail(),header , body  );
+        eventService.save (request,event);
     }
 
 

@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Getter
@@ -28,11 +29,10 @@ public class Event {
     @Column(name = "bookingEmail" ,length = 50)
     private String bookingEmail;
 
-
     @NotNull(message = "StartTime cannot null")
     @Future(message = "StartTime must be a future date")
     @Column(name = "eventStartTime", nullable = false)
-    private ZonedDateTime eventStartTime;
+    private LocalDateTime eventStartTime;
 
     @Size(max = 500,message = "Notes size must between 0 and 500 character")
     @Column(name = "eventNote")
@@ -44,5 +44,9 @@ public class Event {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "eventCategoryId", nullable = false)
     private EventCategory eventCategory;
+
+    public String eventCategoryName(){
+        return this.eventCategory.getEventCategoryName();
+    }
 
 }

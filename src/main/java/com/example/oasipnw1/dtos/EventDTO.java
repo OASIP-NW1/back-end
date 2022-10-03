@@ -6,6 +6,8 @@ import lombok.Setter;
 
 
 import javax.validation.constraints.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Getter
@@ -28,13 +30,14 @@ public class EventDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @NotNull(message = "StartTime cannot null")
     @Future(message = "StartTime must be a future date")
-    private ZonedDateTime eventStartTime;
+    private LocalDateTime eventStartTime;
 
     private Integer eventDuration;
 
     @Size(max = 500,message = "Notes size must between 0 and 500 character")
     private String eventNote;
     private EventCategoryDTO eventCategory;
+
     public String getEventCategoryName() {
         return eventCategory.getEventCategoryName();
     }
