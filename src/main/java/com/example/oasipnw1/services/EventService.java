@@ -23,6 +23,7 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -51,30 +52,30 @@ public class EventService  {
     private JwtUserDetailsService jwtuserDetailsService;
 
     public Event save(@Valid HttpServletRequest request, Event event) {
-        ZonedDateTime newEventStartTime = event.getEventStartTime();
-        ZonedDateTime newEventEndTime = findEndDate(event.getEventStartTime(), event.getEventDuration());
+        LocalDateTime newEventStartTime = event.getEventStartTime();
+        LocalDateTime newEventEndTime = findEndDate(event.getEventStartTime(), event.getEventDuration());
         List<EventDTO> eventList = getAllEvent();
 
-        for (int i = 0; i < eventList.size(); i++) {
-            ZonedDateTime eventStartTime = eventList.get(i).getEventStartTime();
-            if(eventStartTime.isEqual(newEventStartTime)){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
-            }else {
-                ZonedDateTime eventEndTime = findEndDate(eventList.get(i).getEventStartTime(),
-                        eventList.get(i).getEventDuration());
-                if (newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventStartTime) ||
-                        newEventStartTime.isBefore(eventEndTime) && newEventEndTime.isAfter(eventEndTime) ||
-                        newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventEndTime) ||
-                        newEventStartTime.isAfter(eventStartTime) && newEventEndTime.isBefore(eventEndTime)
-                        || newEventStartTime.equals(eventStartTime)) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
-                }
-            }
-        }
+//        for (int i = 0; i < eventList.size(); i++) {
+//            ZonedDateTime eventStartTime = eventList.get(i).getEventStartTime();
+//            if(eventStartTime.isEqual(newEventStartTime)){
+//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
+//            }else {
+//                ZonedDateTime eventEndTime = findEndDate(eventList.get(i).getEventStartTime(),
+//                        eventList.get(i).getEventDuration());
+//                if (newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventStartTime) ||
+//                        newEventStartTime.isBefore(eventEndTime) && newEventEndTime.isAfter(eventEndTime) ||
+//                        newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventEndTime) ||
+//                        newEventStartTime.isAfter(eventStartTime) && newEventEndTime.isBefore(eventEndTime)
+//                        || newEventStartTime.equals(eventStartTime)) {
+//                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
+//                }
+//            }
+//        }
         return repository.saveAndFlush(event);
     }
 
-    public ZonedDateTime findEndDate(ZonedDateTime date, Integer duration){
+    public LocalDateTime findEndDate(LocalDateTime date, Integer duration){
         return date.plusMinutes(duration);
     }
 
@@ -141,34 +142,4 @@ public class EventService  {
         return jwtTokenUtil.getUsernameFromToken(requestAccessToken);
     }
 
-//    private void sendmail(Event event) throws AddressException, MessagingException, IOException {
-//        Properties props = new Properties();
-//        props.put("mail.smtp.auth", "true");
-//        props.put("mail.smtp.starttls.enable", "true");
-//        props.put("mail.smtp.host", "smtp.gmail.com");
-//        props.put("mail.smtp.port", "587");
-//
-//        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
-//            protected PasswordAuthentication getPasswordAuthentication() {
-//                return new PasswordAuthentication("wppoyo@gmail.com", "jgxnxaniytaytjxa");
-//            }
-//        });
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy 'at' hh:mm a").withZone(ZoneId.systemDefault());
-//
-//        Message msg = new MimeMessage(session);
-//        msg.setFrom(new InternetAddress("wppoyo@gmail.com", false));
-//
-//        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(event.getBookingEmail()));
-//        msg.setSubject("Your booking is complete.");
-//        msg.setContent("Your booking name : " + event.getBookingName() +
-//                        "<br> Event category : " + event.getEventCategory() +
-//
-//                        "<br><br>Start date and time : " + formatter.format(event.getEventStartTime()) +
-//                        "<br>Event duration : " + event.getEventDuration() +
-//
-//                        "<br><br>Event note : " + event.getEventNote()
-//                , "text/html");
-//        msg.setSentDate(new Date());
-//        Transport.send(msg);
-//    }
 }

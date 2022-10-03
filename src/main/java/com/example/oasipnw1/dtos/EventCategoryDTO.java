@@ -1,14 +1,16 @@
 package com.example.oasipnw1.dtos;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.*;
 
 @Getter
 @Setter
-//@NoArgsConstructor
-//@AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class EventCategoryDTO {
 
     @NotNull(message = "ID cannot null")
@@ -16,13 +18,13 @@ public class EventCategoryDTO {
 
     @NotBlank(message = "eventCategoryName cannot be empty")
     @Size(max = 100, message = "eventCategoryName Must not exceed 100 characters.")
-    private String eventCategoryName;
+    public String eventCategoryName;
 
     private String eventCategoryDescription;
 
     private Integer eventDuration;
 
-//    public String getCategoryName() {
-//        return eventCategoryName;
-//    }
+    public String getCategoryName() {
+        return eventCategoryName;
+    }
 }

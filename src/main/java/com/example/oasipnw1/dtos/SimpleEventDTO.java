@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Getter
@@ -14,7 +15,7 @@ public class SimpleEventDTO {
     private String bookingName;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private ZonedDateTime eventStartTime;
+    private LocalDateTime eventStartTime;
 
     private Integer eventDuration;
     @JsonIgnore
