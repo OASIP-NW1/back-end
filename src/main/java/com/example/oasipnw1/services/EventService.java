@@ -2,15 +2,18 @@ package com.example.oasipnw1.services;
 
 import com.example.oasipnw1.config.JwtTokenUtil;
 import com.example.oasipnw1.dtos.EventDTO;
+import com.example.oasipnw1.dtos.EventDetailDTO;
 import com.example.oasipnw1.dtos.EventPageDTO;
 import com.example.oasipnw1.dtos.EventUpdateDTO;
 import com.example.oasipnw1.entites.Event;
+import com.example.oasipnw1.entites.EventCategory;
 import com.example.oasipnw1.repository.EventRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,11 +30,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
-//
+
 @Service
 
 public class EventService  {
@@ -56,24 +60,52 @@ public class EventService  {
         LocalDateTime newEventEndTime = findEndDate(event.getEventStartTime(), event.getEventDuration());
         List<EventDTO> eventList = getAllEvent();
 
-//        for (int i = 0; i < eventList.size(); i++) {
-//            ZonedDateTime eventStartTime = eventList.get(i).getEventStartTime();
-//            if(eventStartTime.isEqual(newEventStartTime)){
-//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
-//            }else {
-//                ZonedDateTime eventEndTime = findEndDate(eventList.get(i).getEventStartTime(),
-//                        eventList.get(i).getEventDuration());
-//                if (newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventStartTime) ||
-//                        newEventStartTime.isBefore(eventEndTime) && newEventEndTime.isAfter(eventEndTime) ||
-//                        newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventEndTime) ||
-//                        newEventStartTime.isAfter(eventStartTime) && newEventEndTime.isBefore(eventEndTime)
-//                        || newEventStartTime.equals(eventStartTime)) {
-//                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
-//                }
-//            }
-//        }
+        Event e = modelMapper.map(event, Event.class);
+        String getUserEmail = getUserEmail(getRequestAccessToken(request));
+        if(request.isUserInRole("student")){
+            if(getUserEmail.equals(event.getBookingEmail())){
+                System.out.println("Booking email same as the student's email!");
+                return repository.saveAndFlush(e);
+            }else{
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Booking email must be the same as the student's email");
+            }
+        }
         return repository.saveAndFlush(event);
     }
+
+    public EventDetailDTO getEventById(Integer id, HttpServletRequest request){
+        Event events = repository.findById(id)
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Can't get event, event id "+ id +
+                        " doesn't exist."
+                ));
+        String getUserEmail = getUserEmail(getRequestAccessToken(request));
+        if(request.isUserInRole("student")){
+            if(getUserEmail.equals(events.getBookingEmail())){
+                System.out.println("Booking email same as the student's email!");
+                return modelMapper.map(events,EventDetailDTO.class);
+            }else{
+                System.out.println("Booking email must be the same as the student's email!");
+                throw new AccessDeniedException("");
+
+            }
+//        }else if(request.isUserInRole("lecturer")){
+//            ArrayList<EventCategory> listCategory = new ArrayList<>();
+//            List<Event> eventsListByCategoryOwner = repository.findEventsCategoryOwnerByEmail(getUserEmail);
+//            System.out.println(eventsListByCategoryOwner);
+//            for(Event event : eventsListByCategoryOwner){
+//                listCategory.add(event.getEventCategory());
+//            }
+//            if(listCategory.contains(events.getEventCategory())){
+//                System.out.println("Yes Owner");
+//                return modelMapper.map(events,EventDetailDTO.class);
+//            }else{
+//                System.out.println("No owner");
+//                throw new AccessDeniedException("");
+//            }
+        }
+        return modelMapper.map(events,EventDetailDTO.class);
+    }
+
 
     public LocalDateTime findEndDate(LocalDateTime date, Integer duration){
         return date.plusMinutes(duration);
@@ -103,7 +135,6 @@ public class EventService  {
         return modelMapper.map(repository.findAll(
                         PageRequest.of(page, pageSize, sort.descending())),
                 EventPageDTO.class);
-
     }
 
     public EventUpdateDTO updateEvent(EventUpdateDTO updateEvent, Integer id) {
@@ -122,14 +153,12 @@ public class EventService  {
         if(userDetails != null && (request.isUserInRole("ROLE_student"))){
             List<Event> eventsListByEmail = repository.findByBookingEmail(getUserEmail);
             return listMapper.mapList(eventsListByEmail, EventDTO.class,modelMapper);
-
         }
         else if(userDetails != null && (request.isUserInRole("ROLE_lecturer"))){
 //            List<Events> eventsListByEmail = repository.findByBookingEmail(getUserEmail);
-            List<Event> eventListByCategoryOwner = repository.findEventCategoryOwnerByEmail(getUserEmail);
+//            List<Event> eventListByCategoryOwner = repository.findEventCategoryOwnerByEmail(getUserEmail);
 
-            return listMapper.mapList(eventListByCategoryOwner , EventDTO.class,modelMapper);
-
+//            return listMapper.mapList(eventListByCategoryOwner , EventDTO.class,modelMapper);
         }
         return listMapper.mapList(eventsList, EventDTO.class,modelMapper);
     }

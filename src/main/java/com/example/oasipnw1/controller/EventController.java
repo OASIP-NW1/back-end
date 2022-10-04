@@ -5,7 +5,7 @@ import com.example.oasipnw1.entites.Event;
 import com.example.oasipnw1.entites.EventCategory;
 import com.example.oasipnw1.repository.EventCategoryRepository;
 import com.example.oasipnw1.repository.EventRepository;
-import com.example.oasipnw1.services.EmailSerderService;
+//import com.example.oasipnw1.services.EmailSerderService;
 import com.example.oasipnw1.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,8 +34,8 @@ public class EventController {
     @Autowired
     private EventCategory eventCategory;
 
-    @Autowired
-    private EmailSerderService serderService;
+//    @Autowired
+//    private EmailSerderService serderService;
 //    public EmailSerderService(EmailSerderService serderService , EventCategoryRepository eventCategoryRepository){
 //        this.serderService = serderService;
 //        this.eventRepository = eventCategoryRepository;
@@ -45,9 +45,14 @@ public class EventController {
         return eventService.getAll(httpServletRequest);
     }
 
+//    @GetMapping("/{id}")
+//    public EventDTO getEventById(@PathVariable Integer id){
+//        return eventService.getEventById(id);
+//    }
     @GetMapping("/{id}")
-    public EventDTO getEventById(@PathVariable Integer id){
-        return eventService.getEventById(id);
+    @ResponseStatus(code = HttpStatus.OK)
+    public EventDetailDTO getEventById(@PathVariable Integer id, HttpServletRequest request) {
+        return eventService.getEventById(id, request);
     }
 
     @GetMapping("/page")
@@ -61,16 +66,16 @@ public class EventController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("")
     public void Event (@Valid HttpServletRequest request , @Valid @RequestBody Event event) {
-        LocalDateTime localDateTime = event.getEventStartTime();
-        System.out.println(event.eventCategoryName());
-        String newformat = localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        String header = "You have made a new appointment ." + '\n' ;
-        String body = "Your booking name : " + event.getBookingName() + '\n' +
-                "Event category : " + " " + event.getEventCategory().getEventCategoryName() + '\n' +
-                "Start date and time : " +  " " + newformat + '\n' +
-                "Event duration : " +  " " +event.getEventDuration() + "Minutes" + '\n' +
-                "Event note : " +  " " +event.getEventNote();
-        serderService.sendNotification(event.getBookingEmail(),header , body  );
+//        LocalDateTime localDateTime = event.getEventStartTime();
+//        System.out.println(event.eventCategoryName());
+//        String newformat = localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+//        String header = "You have made a new appointment ." + '\n' ;
+//        String body = "Your booking name : " + event.getBookingName() + '\n' +
+//                "Event category : " + " " + event.getEventCategory().getEventCategoryName() + '\n' +
+//                "Start date and time : " +  " " + newformat + '\n' +
+//                "Event duration : " +  " " +event.getEventDuration() + "Minutes" + '\n' +
+//                "Event note : " +  " " +event.getEventNote();
+//        serderService.sendNotification(event.getBookingEmail(),header , body  );
         eventService.save (request,event);
     }
 
