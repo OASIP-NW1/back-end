@@ -1,5 +1,6 @@
 package com.example.oasipnw1.entites;
 
+import com.example.oasipnw1.dtos.EventDetailDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -45,8 +46,9 @@ public class Event {
     @JoinColumn(name = "eventCategoryId", nullable = false)
     private EventCategory eventCategory;
 
-    public String eventCategoryName(){
-        return this.eventCategory.getEventCategoryName();
+    public String getEventCategoryName(Event event) {
+
+        return event.getEventCategoryName(event);
     }
 
 }
