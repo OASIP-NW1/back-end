@@ -29,14 +29,6 @@ public class EventCategory {
 
     private String eventCategoryDescription;
 
-    public String getEventCategoryNames() {
-        return eventCategoryName;
-    }
-
-    public void setEventCategoryName(String eventCategoryName) {
-        this.eventCategoryName = eventCategoryName;
-    }
-
     @Column(name = "eventDuration", nullable = false)
     private Integer eventDuration;
 }

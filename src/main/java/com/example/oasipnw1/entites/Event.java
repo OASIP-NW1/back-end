@@ -45,8 +45,59 @@ public class Event {
     @JoinColumn(name = "eventCategoryId", nullable = false)
     private EventCategory eventCategory;
 
-    public String eventCategoryName(){
-        return this.eventCategory.getEventCategoryName();
+    public Integer getId() {
+        return id;
     }
 
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getBookingName() {
+        return bookingName;
+    }
+
+    public void setBookingName(String bookingName) {
+        this.bookingName = bookingName;
+    }
+
+    public String getBookingEmail() {
+        return bookingEmail;
+    }
+
+    public void setBookingEmail(String bookingEmail) {
+        this.bookingEmail = bookingEmail;
+    }
+
+    public LocalDateTime getEventStartTime() {
+        return eventStartTime;
+    }
+
+    public void setEventStartTime(LocalDateTime eventStartTime) {
+        this.eventStartTime = eventStartTime;
+    }
+
+    public String getEventNote() {
+        return eventNote;
+    }
+
+    public void setEventNote(String eventNote) {
+        this.eventNote = eventNote;
+    }
+
+    public Integer getEventDuration() {
+        return eventDuration;
+    }
+
+    public void setEventDuration(Integer eventDuration) {
+        this.eventDuration = eventDuration;
+    }
+
+    public EventCategory getEventCategory() {
+        return eventCategory;
+    }
+
+    public void setEventCategory(EventCategory eventCategory) {
+        this.eventCategory = eventCategory;
+    }
 }
