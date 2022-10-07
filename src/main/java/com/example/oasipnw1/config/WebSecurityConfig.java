@@ -37,6 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         this.jwtRequestFilter = jwtRequestFilter;
         this.argon2PasswordEncoder = argon2PasswordEncoder;
     }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(jwtUserDetailsService).passwordEncoder(argon2PasswordEncoder);
