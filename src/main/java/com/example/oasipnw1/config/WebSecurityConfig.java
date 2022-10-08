@@ -49,11 +49,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                 .accessDeniedHandler(accessDeniedHandler())
                 .and()
+//               guset
+                .anonymous().principal("guest").authorities("ROLE_guest").and()
 //                .exceptionHandling().accessDeniedHandler(new JwtAccessDenied()).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+//                all role
                 .authorizeRequests()
                 .antMatchers("/api/login","/api/users/signup").permitAll()
+//                admin
                 .antMatchers("/api/users/**","/api/match/**").hasRole("admin")
+//                request role
                 .antMatchers(HttpMethod.GET, "/api/events","/api/events/{id}").hasAnyRole("admin","student","lecturer")
                 .antMatchers(HttpMethod.POST, "/api/events").hasAnyRole("admin","student","guest")
                 .antMatchers(HttpMethod.PUT, "/api/events/{id}").hasAnyRole("admin","student")

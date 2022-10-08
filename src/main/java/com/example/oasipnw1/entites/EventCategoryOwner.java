@@ -1,6 +1,9 @@
 package com.example.oasipnw1.entites;
 
 
+import org.springframework.stereotype.Service;
+
+
 import javax.persistence.*;
 
 @Entity
@@ -45,3 +48,4 @@ public class EventCategoryOwner {
     }
 
 }
+

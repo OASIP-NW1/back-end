@@ -60,10 +60,6 @@ public class EventService {
     private EmailSerderService emailSerderService;
 
     public Event save(@Valid HttpServletRequest request, Event event) {
-//        LocalDateTime newEventStartTime = event.getEventStartTime();
-//        LocalDateTime newEventEndTime = findEndDate(event.getEventStartTime(), event.getEventDuration());
-//        List<EventDTO> eventList = getAllEvent();
-
         Event e = modelMapper.map(event, Event.class);
         String getUserEmail = getUserEmail(getRequestAccessToken(request));
         if (request.isUserInRole("student")) {
@@ -105,22 +101,21 @@ public class EventService {
             } else {
                 System.out.println("Booking email must be the same as the student's email!");
                 throw new AccessDeniedException("");
-
             }
-//        }else if(request.isUserInRole("lecturer")){
-//            ArrayList<EventCategory> listCategory = new ArrayList<>();
-//            List<Event> eventsListByCategoryOwner = repository.findEventsCategoryOwnerByEmail(getUserEmail);
-//            System.out.println(eventsListByCategoryOwner);
-//            for(Event event : eventsListByCategoryOwner){
-//                listCategory.add(event.getEventCategory());
-//            }
-//            if(listCategory.contains(events.getEventCategory())){
-//                System.out.println("Yes Owner");
-//                return modelMapper.map(events,EventDetailDTO.class);
-//            }else{
-//                System.out.println("No owner");
-//                throw new AccessDeniedException("");
-//            }
+        }else if(request.isUserInRole("lecturer")){
+            ArrayList<EventCategory> listCategory = new ArrayList<>();
+            List<Event> eventsListByCategoryOwner = repository.findEventCategoryOwnerByEmail(getUserEmail);
+            System.out.println(eventsListByCategoryOwner);
+            for(Event event : eventsListByCategoryOwner){
+                listCategory.add(event.getEventCategory());
+            }
+            if(listCategory.contains(events.getEventCategory())){
+                System.out.println("Yes Owner");
+                return modelMapper.map(events,EventDetailDTO.class);
+            }else{
+                System.out.println("No owner");
+                throw new AccessDeniedException("");
+            }
         }
         return modelMapper.map(events, EventDetailDTO.class);
     }
@@ -174,9 +169,9 @@ public class EventService {
             return listMapper.mapList(eventsListByEmail, EventDTO.class, modelMapper);
         } else if (userDetails != null && (request.isUserInRole("ROLE_lecturer"))) {
 //            List<Events> eventsListByEmail = repository.findByBookingEmail(getUserEmail);
-//            List<Event> eventListByCategoryOwner = repository.findEventCategoryOwnerByEmail(getUserEmail);
+            List<Event> eventListByCategoryOwner = repository.findEventCategoryOwnerByEmail(getUserEmail);
 
-//            return listMapper.mapList(eventListByCategoryOwner , EventDTO.class,modelMapper);
+            return listMapper.mapList(eventListByCategoryOwner , EventDTO.class,modelMapper);
         }
         return listMapper.mapList(eventsList, EventDTO.class, modelMapper);
     }
