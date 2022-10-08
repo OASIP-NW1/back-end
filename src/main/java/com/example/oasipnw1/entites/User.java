@@ -9,6 +9,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
@@ -41,10 +42,10 @@ public class User {
 
     @Column(name = "createdOn",insertable = false)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private ZonedDateTime createdOn;
+    private LocalDateTime createdOn;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "updatedOn",insertable = false,updatable = false)
-    private ZonedDateTime updatedOn;
+    private LocalDateTime updatedOn;
 
 }

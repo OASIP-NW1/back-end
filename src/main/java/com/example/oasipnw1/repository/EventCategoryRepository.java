@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface EventCategoryRepository extends JpaRepository<EventCategory, Integer> {
 //    List<Event> findByEventCategoryId(Integer eventCategoryId);
+public EventCategory findByEventCategoryName(String name);
 }
 
