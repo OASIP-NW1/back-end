@@ -1,15 +1,9 @@
 package com.example.oasipnw1.entites;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "Event")
 public class Event {
@@ -18,24 +12,16 @@ public class Event {
     @Column(name = "bookingId", nullable = false)
     private Integer id;
 
-    @NotBlank(message = "Booking Name is not empty")
-    @Size(max = 100,message = "Booking Name size must between 0 and 100 character")
-    @Column(name = "bookingName", nullable = false)
+    @Column(name = "bookingName", nullable = false, length = 100)
     private String bookingName;
 
-    @Email(message = "Email must be a well-formed email address" ,regexp = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])")
-    @NotBlank(message = "Email cannot be empty")
-    @Size(max = 50, message = "Email size is invalid")
-    @Column(name = "bookingEmail" ,length = 50)
+    @Column(name = "bookingEmail", length = 50)
     private String bookingEmail;
 
-    @NotNull(message = "StartTime cannot null")
-    @Future(message = "StartTime must be a future date")
     @Column(name = "eventStartTime", nullable = false)
     private LocalDateTime eventStartTime;
 
-    @Size(max = 500,message = "Notes size must between 0 and 500 character")
-    @Column(name = "eventNote")
+    @Column(name = "eventNote", length = 500)
     private String eventNote;
 
     @Column(name = "eventDuration", nullable = false)
@@ -45,44 +31,12 @@ public class Event {
     @JoinColumn(name = "eventCategoryId", nullable = false)
     private EventCategory eventCategory;
 
-    public Integer getId() {
-        return id;
+    public EventCategory getEventCategory() {
+        return eventCategory;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getBookingName() {
-        return bookingName;
-    }
-
-    public void setBookingName(String bookingName) {
-        this.bookingName = bookingName;
-    }
-
-    public String getBookingEmail() {
-        return bookingEmail;
-    }
-
-    public void setBookingEmail(String bookingEmail) {
-        this.bookingEmail = bookingEmail;
-    }
-
-    public LocalDateTime getEventStartTime() {
-        return eventStartTime;
-    }
-
-    public void setEventStartTime(LocalDateTime eventStartTime) {
-        this.eventStartTime = eventStartTime;
-    }
-
-    public String getEventNote() {
-        return eventNote;
-    }
-
-    public void setEventNote(String eventNote) {
-        this.eventNote = eventNote;
+    public void setEventCategory(EventCategory eventCategory) {
+        this.eventCategory = eventCategory;
     }
 
     public Integer getEventDuration() {
@@ -93,11 +47,43 @@ public class Event {
         this.eventDuration = eventDuration;
     }
 
-    public EventCategory getEventCategory() {
-        return eventCategory;
+    public String getEventNote() {
+        return eventNote;
     }
 
-    public void setEventCategory(EventCategory eventCategory) {
-        this.eventCategory = eventCategory;
+    public void setEventNote(String eventNote) {
+        this.eventNote = eventNote;
+    }
+
+    public LocalDateTime getEventStartTime() {
+        return eventStartTime;
+    }
+
+    public void setEventStartTime(LocalDateTime eventStartTime) {
+        this.eventStartTime = eventStartTime;
+    }
+
+    public String getBookingEmail() {
+        return bookingEmail;
+    }
+
+    public void setBookingEmail(String bookingEmail) {
+        this.bookingEmail = bookingEmail;
+    }
+
+    public String getBookingName() {
+        return bookingName;
+    }
+
+    public void setBookingName(String bookingName) {
+        this.bookingName = bookingName;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }
