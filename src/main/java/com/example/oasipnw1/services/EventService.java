@@ -7,7 +7,14 @@ import com.example.oasipnw1.dtos.EventPageDTO;
 import com.example.oasipnw1.dtos.EventUpdateDTO;
 import com.example.oasipnw1.entites.Event;
 import com.example.oasipnw1.entites.EventCategory;
+<<<<<<< HEAD
+=======
+import com.example.oasipnw1.entites.User;
+import com.example.oasipnw1.repository.EventCategoryOwnerRepository;
+import com.example.oasipnw1.repository.EventCategoryRepository;
+>>>>>>> 4696dfe4f60c57836eaf5c7ae24f3013fb62b06a
 import com.example.oasipnw1.repository.EventRepository;
+import com.example.oasipnw1.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -49,6 +56,11 @@ public class EventService {
     @Autowired
     private EmailSerderService emailSerderService;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private EventCategoryOwnerRepository eventCategoryOwnerRepository;
     public Event save(@Valid HttpServletRequest request, Event event) {
         Event e = modelMapper.map(event, Event.class);
         String getUserEmail = getUserEmail(getRequestAccessToken(request));
@@ -148,6 +160,12 @@ public class EventService {
         event.setEventNote(updateEvent.getEventNote());
         repository.saveAndFlush(event);
         return updateEvent;
+    }
+
+    public User getUserFromRequest(HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7);
+        String userEmail = jwtTokenUtil.getUsernameFromToken(token);
+        return  userRepository.findByEmail(userEmail);
     }
 
     public List<EventDTO> getAll(HttpServletRequest request) {
