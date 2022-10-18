@@ -7,12 +7,8 @@ import com.example.oasipnw1.dtos.EventPageDTO;
 import com.example.oasipnw1.dtos.EventUpdateDTO;
 import com.example.oasipnw1.entites.Event;
 import com.example.oasipnw1.entites.EventCategory;
-<<<<<<< HEAD
-=======
 import com.example.oasipnw1.entites.User;
 import com.example.oasipnw1.repository.EventCategoryOwnerRepository;
-import com.example.oasipnw1.repository.EventCategoryRepository;
->>>>>>> 4696dfe4f60c57836eaf5c7ae24f3013fb62b06a
 import com.example.oasipnw1.repository.EventRepository;
 import com.example.oasipnw1.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -23,12 +19,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,9 +49,9 @@ public class EventService {
 
     @Autowired
     private JwtUserDetailsService jwtuserDetailsService;
-
-    @Autowired
-    private EmailSerderService emailSerderService;
+//
+//    @Autowired
+//    private EmailSerderService emailSerderService;
 
     @Autowired
     private UserRepository userRepository;
@@ -74,19 +71,24 @@ public class EventService {
         try {
             LocalDateTime localDateTime = e.getEventStartTime();
             System.out.println(e.getEventCategory().getEventCategoryName());
-            String newformat = localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            String newformat = localDateTime.format(DateTimeFormatter.ofPattern("E MMM dd, yyyy HH:mm").withZone(ZoneId.of("UTC")));
             String header = "You have made a new appointment ." + '\n';
-            String body = "Your booking name : " + e.getBookingName() + '\n' +
-                    "Event category : " + " " + e.getEventCategory().getEventCategoryName() + '\n' +
-                    "Start date and time : " + " " + newformat + '\n' +
-                    "Event duration : " + " " + e.getEventDuration() + "Minutes" + '\n' +
-                    "Event note : " + " " + e.getEventNote();
-            emailSerderService.sendSimpleMail(e.getBookingEmail(), header, body);
+            String body =
+                            "Subject : [OASIP]" + " " + e.getEventCategory().getEventCategoryName() + " " + "@" + " " + newformat + " " + "-" + " " + findEndDate(e.getEventStartTime(),e.getEventDuration()).toString().substring(11) + " (ICT)" + '\n' +
+                            "Reply-to : " + "noreply@intproj21.sit.kmutt.ac.th" + '\n' +
+                            "Booking Name : " + e.getBookingName() + '\n' +
+                            "Event Category : " + e.getEventCategory().getEventCategoryName() + '\n' +
+                            "When : " + newformat + " " + "-" + " " + findEndDate(e.getEventStartTime(),e.getEventDuration()).toString().substring(11) + " (ICT)" + '\n' +
+//                          "When : " + " " + e.getEventStartTime().toString().replace("T" , " ")+ " " + "-" + " " + findEndDate(e.getEventStartTime(),e.getEventDuration()).toString().substring(11) + '\n' +
+//                          "Event duration : " + e.getEventDuration() + "Minutes" + '\n' +
+                            "Event note : "  + e.getEventNote();
+//            emailSerderService.sendSimpleMail(e.getBookingEmail(), header, body);
             System.out.println("email sent succesfully");
         } catch (Exception ex) {
             System.out.println(ex);
             System.out.println("email sent failed");
         }
+
         return repository.saveAndFlush(event);
     }
 

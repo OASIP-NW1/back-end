@@ -4,11 +4,13 @@ import com.example.oasipnw1.dtos.*;
 import com.example.oasipnw1.entites.Event;
 import com.example.oasipnw1.entites.EventCategory;
 import com.example.oasipnw1.repository.EventRepository;
-import com.example.oasipnw1.services.EmailSerderService;
+//import com.example.oasipnw1.services.EmailSerderService;
 import com.example.oasipnw1.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,8 +29,8 @@ public class EventController {
     @Autowired
     private EventCategory eventCategory;
 
-    @Autowired
-    private EmailSerderService serderService;
+//    @Autowired
+//    private EmailSerderService serderService;
     //    public EmailSerderService(EmailSerderService serderService , EventCategoryRepository eventCategoryRepository){
 //        this.serderService = serderService;
 //        this.eventRepository = eventCategoryRepository;
@@ -58,6 +60,7 @@ public class EventController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("")
+    @PreAuthorize("!isAuthenticated() or hasAnyRole(\"admin\",\"student\")")
     public void Event (@Valid HttpServletRequest request , @Valid @RequestBody Event event) {
         //        LocalDateTime localDateTime = event.getEventStartTime();
 //        System.out.println(event.eventCategoryName());
@@ -69,7 +72,7 @@ public class EventController {
 //                "Event duration : " +  " " +event.getEventDuration() + "Minutes" + '\n' +
 //                "Event note : " +  " " +event.getEventNote();
 //        serderService.sendNotification(event.getBookingEmail(),header , body  );
-        eventService.save (request,event);
+        eventService.save(request,event);
     }
 
 

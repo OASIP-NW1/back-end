@@ -51,7 +51,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
 //               guset
                 .anonymous().principal("guest").authorities("ROLE_guest").and()
-//                .exceptionHandling().accessDeniedHandler(new JwtAccessDenied()).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 //                all role
                 .authorizeRequests()
@@ -60,11 +59,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/users/**","/api/match/**").hasRole("admin")
 //                request role
                 .antMatchers(HttpMethod.GET, "/api/events","/api/events/{id}").hasAnyRole("admin","student","lecturer")
-                .antMatchers(HttpMethod.POST, "/api/events").hasAnyRole("admin","student","guest")
+                .antMatchers(HttpMethod.POST, "/api/events").permitAll()
                 .antMatchers(HttpMethod.PUT, "/api/events/{id}").hasAnyRole("admin","student")
                 .antMatchers(HttpMethod.DELETE, "/api/events/{id}").hasAnyRole("admin","student")
+                .antMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("admin")
                 .anyRequest().authenticated();
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+    }
 //                .antMatchers("/api/events/**").hasRole("student")
 //                .antMatchers("/api/events/**").access("hasRole('admin') or hasRole('student')")
 //                .antMatchers("/api/refresh").permitAll()
@@ -88,7 +89,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //
 //        Add a filter to validate the tokens with every request
 //        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-    }
+
 
     @Override @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
