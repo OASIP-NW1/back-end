@@ -9,6 +9,7 @@ import com.example.oasipnw1.services.EmailSerderService;
 import com.example.oasipnw1.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -65,6 +66,7 @@ public class EventController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("")
+    @PreAuthorize("!isAuthenticated() or hasAnyRole(\"admin\",\"student\")")
     public void Event (@Valid HttpServletRequest request , @Valid @RequestBody Event event) {
         //        LocalDateTime localDateTime = event.getEventStartTime();
 //        System.out.println(event.eventCategoryName());

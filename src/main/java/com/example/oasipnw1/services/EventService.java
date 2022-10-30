@@ -182,9 +182,7 @@ public class EventService {
             List<Event> eventsListByEmail = repository.findByBookingEmail(getUserEmail);
             return listMapper.mapList(eventsListByEmail, EventDTO.class, modelMapper);
         } else if (userDetails != null && (request.isUserInRole("ROLE_lecturer"))) {
-//            List<Events> eventsListByEmail = repository.findByBookingEmail(getUserEmail);
             List<Event> eventListByCategoryOwner = repository.findEventCategoryOwnerByEmail(getUserEmail);
-
             return listMapper.mapList(eventListByCategoryOwner , EventDTO.class,modelMapper);
         }
         return listMapper.mapList(eventsList, EventDTO.class, modelMapper);

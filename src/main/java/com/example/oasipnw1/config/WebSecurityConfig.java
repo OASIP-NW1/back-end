@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
-
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -50,7 +49,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
 //               guset
                 .anonymous().principal("guest").authorities("ROLE_guest").and()
-//                .exceptionHandling().accessDeniedHandler(new JwtAccessDenied()).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 //                all role
                 .authorizeRequests()
@@ -59,34 +57,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/users/**","/api/match/**").hasRole("admin")
 //                request role
                 .antMatchers(HttpMethod.GET, "/api/events","/api/events/{id}").hasAnyRole("admin","student","lecturer")
-                .antMatchers(HttpMethod.POST, "/api/events").hasAnyRole("admin","student","guest")
+                .antMatchers(HttpMethod.POST, "/api/events").permitAll()
                 .antMatchers(HttpMethod.PUT, "/api/events/{id}").hasAnyRole("admin","student")
                 .antMatchers(HttpMethod.DELETE, "/api/events/{id}").hasAnyRole("admin","student")
+                .antMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("admin")
                 .anyRequest().authenticated();
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-//                .antMatchers("/api/events/**").hasRole("student")
-//                .antMatchers("/api/events/**").access("hasRole('admin') or hasRole('student')")
-//                .antMatchers("/api/refresh").permitAll()
-
-//        method we'll configure patterns to define protected/unprotected API endpoints. Please note that we have disabled CSRF protection because we are not using Cookies.
-//
-//
-//        We don't need CSRF for this example
-//        httpSecurity.csrf().disable().cors().disable()
-//                dont authenticate this particular request
-//                .authorizeRequests().antMatchers("/api/login").permitAll()
-//                .antMatchers("/api/users/signup").permitAll() //user sign
-//                all other requests need to be authenticated
-//                .anyRequest().authenticated().and().sessionManagement().
-//                sessionCreationPolicy(SessionCreationPolicy.STATELESS).
-//                and().exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
-//                make sure we use stateless session; session won't be used to
-//                store user's state.
-//                        exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//
-//        Add a filter to validate the tokens with every request
-//        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override @Bean
