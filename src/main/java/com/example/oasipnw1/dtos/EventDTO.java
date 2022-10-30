@@ -38,7 +38,8 @@ public class EventDTO {
     private String eventNote;
     private EventCategoryDTO eventCategory;
 
-    public String getEventCategoryName() {
-        return eventCategory.getEventCategoryName();
+    public String getEventCategoryName(EventDetailDTO eventDetailDTO) {
+
+        return eventDetailDTO.getEventCategoryName();
     }
 }

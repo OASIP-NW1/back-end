@@ -20,6 +20,7 @@ public class RefreshController {
 
     @Autowired
     public RefreshController(RefreshService refreshService) {
+
         this.refreshService = refreshService;
     }
 

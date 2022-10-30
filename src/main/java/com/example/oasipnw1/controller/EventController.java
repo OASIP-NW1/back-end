@@ -3,24 +3,18 @@ package com.example.oasipnw1.controller;
 import com.example.oasipnw1.dtos.*;
 import com.example.oasipnw1.entites.Event;
 import com.example.oasipnw1.entites.EventCategory;
-import com.example.oasipnw1.repository.EventCategoryRepository;
 import com.example.oasipnw1.repository.EventRepository;
-import com.example.oasipnw1.services.EmailSerderService;
+//import com.example.oasipnw1.services.EmailSerderService;
 import com.example.oasipnw1.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.mail.event.MailEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -35,18 +29,12 @@ public class EventController {
     @Autowired
     private EventCategory eventCategory;
 
-    @Autowired
-    private EmailSerderService serderService;
-//    public EmailSerderService(EmailSerderService serderService , EventCategoryRepository eventCategoryRepository){
-//        this.serderService = serderService;
-//        this.eventRepository = eventCategoryRepository;
-//    }
     @GetMapping("")
     public List<EventDTO> getAllSubject(HttpServletRequest httpServletRequest){
         return eventService.getAll(httpServletRequest);
     }
 
-//    @GetMapping("/{id}")
+    //    @GetMapping("/{id}")
 //    public EventDTO getEventById(@PathVariable Integer id){
 //        return eventService.getEventById(id);
 //    }
@@ -67,20 +55,10 @@ public class EventController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("")
     @PreAuthorize("!isAuthenticated() or hasAnyRole(\"admin\",\"student\")")
-    public void Event (@Valid HttpServletRequest request , @Valid @RequestBody Event event) {
-        //        LocalDateTime localDateTime = event.getEventStartTime();
-//        System.out.println(event.eventCategoryName());
-//        String newformat = localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-//        String header = "You have made a new appointment ." + '\n' ;
-//        String body = "Your booking name : " + event.getBookingName() + '\n' +
-//                "Event category : " + " " + event.getEventCategory().getEventCategoryName() + '\n' +
-//                "Start date and time : " +  " " + newformat + '\n' +
-//                "Event duration : " +  " " +event.getEventDuration() + "Minutes" + '\n' +
-//                "Event note : " +  " " +event.getEventNote();
-//        serderService.sendNotification(event.getBookingEmail(),header , body  );
-        eventService.save (request,event);
+//    public void Event (@Valid HttpServletRequest request , @Valid @RequestBody Event event )
+    public void Event (@Valid HttpServletRequest request , @Valid @RequestPart Event event ,@RequestPart(value = "file" , required = false) MultipartFile multipartFile) {
+        eventService.save(request,event,multipartFile);
     }
-
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id ) {
@@ -106,7 +84,7 @@ public class EventController {
     @PutMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
     public EventUpdateDTO updateEvent(@Valid @RequestBody EventUpdateDTO updateEvent,
-                                @PathVariable Integer id) {
+                                      @PathVariable Integer id) {
         return eventService.updateEvent(updateEvent,id);
 
     }

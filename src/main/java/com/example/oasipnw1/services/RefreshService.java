@@ -31,4 +31,22 @@ public class RefreshService {
         }
         return Response.response(HttpStatus.NOT_FOUND, "Can't find Refresh Token");
     }
+
+    private Boolean checkExpired(String request){
+        if(!jwtTokenUtill.isTokenExpired(request)){
+            return true;
+        }
+        return false;
+    }
 }
+
+//    private Boolean checkExpired(String request){
+//        if(!jwtTokenUtill.isTokenExpired(request)){
+//            return true;
+//        }
+//        return false;
+//    }
+
+
+
+

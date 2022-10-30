@@ -1,0 +1,23 @@
+CREATE TABLE branch
+(branchNo char(5) PRIMARY KEY,
+street varchar(35),
+city varchar(10),
+postcode varchar(10)
+);
+INSERT INTO branch VALUES('B005','22 Deer Rd','London','SW1 4EH');
+INSERT INTO branch VALUES('B003','163 Main St', 'Glasgow','G11 9QX');
+
+CREATE TABLE staff
+(staffNo char(5) PRIMARY KEY,
+fName varchar(10),
+lName varchar(10),
+position varchar(10),
+gender char(1),
+DOB date,
+salary int,
+branchNo char(5)
+);
+INSERT INTO staff VALUES('SL21','John','White','Manager','M','1965-10-01',30000,'B005');
+INSERT INTO staff VALUES('SG37','Ann','Beech','Assistant','F','1980-11-10',12000,'B003');
+INSERT INTO staff VALUES('SG14','David','Ford','Supervisor','M','1978-03-24',18000,'B003');
+INSERT INTO staff VALUES('SG5','Susan','Brand','Manager','F','1960-06-03',24000,'B003');

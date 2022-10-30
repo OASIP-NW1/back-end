@@ -9,7 +9,6 @@ import com.example.oasipnw1.entites.Event;
 import com.example.oasipnw1.entites.EventCategory;
 import com.example.oasipnw1.entites.User;
 import com.example.oasipnw1.repository.EventCategoryOwnerRepository;
-import com.example.oasipnw1.repository.EventCategoryRepository;
 import com.example.oasipnw1.repository.EventRepository;
 import com.example.oasipnw1.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -20,24 +19,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-
-import javax.mail.*;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 
 @Service
@@ -58,42 +49,67 @@ public class EventService {
 
     @Autowired
     private JwtUserDetailsService jwtuserDetailsService;
-
-    @Autowired
-    private EmailSerderService emailSerderService;
+//
+//    @Autowired
+//    private EmailSerderService emailSerderService;
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private EventCategoryOwnerRepository eventCategoryOwnerRepository;
-    public Event save(@Valid HttpServletRequest request, Event event) {
+
+    @Autowired
+    private  FileStorageService fileStorageService;
+
+    public Event save(@Valid HttpServletRequest request, Event event , MultipartFile multipartFile) {
         Event e = modelMapper.map(event, Event.class);
-        String getUserEmail = getUserEmail(getRequestAccessToken(request));
-        if (request.isUserInRole("student")) {
-            if (getUserEmail.equals(event.getBookingEmail())) {
-                System.out.println("Booking email same as the student's email!");
-            } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Booking email must be the same as the student's email");
+        if (request.getHeader("Authorization") != null) {
+            String getUserEmail = getUserEmail(getRequestAccessToken(request));
+            if (request.isUserInRole("student")) {
+                if (getUserEmail.equals(event.getBookingEmail())) {
+                    System.out.println("Booking email same as the student's email!");
+                } else {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Booking email must be the same as the student's email");
+                }
             }
+            try {
+                LocalDateTime localDateTime = e.getEventStartTime();
+                System.out.println(e.getEventCategory().getEventCategoryName());
+                String newformat = localDateTime.format(DateTimeFormatter.ofPattern("E MMM dd, yyyy HH:mm").withZone(ZoneId.of("UTC")));
+                String header = "You have made a new appointment ." + '\n';
+                String body =
+                        "Subject : [OASIP]" + " " + e.getEventCategory().getEventCategoryName() + " " + "@" + " " + newformat + " " + "-" + " " + findEndDate(e.getEventStartTime(), e.getEventDuration()).toString().substring(11) + " (ICT)" + '\n' +
+                                "Reply-to : " + "noreply@intproj21.sit.kmutt.ac.th" + '\n' +
+                                "Booking Name : " + e.getBookingName() + '\n' +
+                                "Event Category : " + e.getEventCategory().getEventCategoryName() + '\n' +
+                                "When : " + newformat + " " + "-" + " " + findEndDate(e.getEventStartTime(), e.getEventDuration()).toString().substring(11) + " (ICT)" + '\n' +
+//                          "When : " + " " + e.getEventStartTime().toString().replace("T" , " ")+ " " + "-" + " " + findEndDate(e.getEventStartTime(),e.getEventDuration()).toString().substring(11) + '\n' +
+//                          "Event duration : " + e.getEventDuration() + "Minutes" + '\n' +
+                                "Event note : " + e.getEventNote();
+//            emailSerderService.sendSimpleMail(e.getBookingEmail(), header, body);
+                System.out.println("email sent succesfully");
+            } catch (Exception ex) {
+                System.out.println(ex);
+                System.out.println("email sent failed");
+            }
+//            getId send file
+            Event saveEvent = repository.saveAndFlush(e);
+            sendFile(multipartFile , saveEvent.getId());
         }
-        try {
-            LocalDateTime localDateTime = e.getEventStartTime();
-            System.out.println(e.getEventCategory().getEventCategoryName());
-            String newformat = localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            String header = "You have made a new appointment ." + '\n';
-            String body = "Your booking name : " + e.getBookingName() + '\n' +
-                    "Event category : " + " " + e.getEventCategory().getEventCategoryName() + '\n' +
-                    "Start date and time : " + " " + newformat + '\n' +
-                    "Event duration : " + " " + e.getEventDuration() + "Minutes" + '\n' +
-                    "Event note : " + " " + e.getEventNote();
-            emailSerderService.sendSimpleMail(e.getBookingEmail(), header, body);
-            System.out.println("email sent succesfully");
-        } catch (Exception ex) {
-            System.out.println(ex);
-            System.out.println("email sent failed");
-        }
+//      เหลือ check error max file
         return repository.saveAndFlush(event);
+    }
+
+// file
+    public void sendFile(MultipartFile multipartFile , Integer id){
+        try {
+            if (multipartFile != null){
+                fileStorageService.storeFile(multipartFile , id);
+            }
+        }catch (Exception e){
+            System.out.println(e);
+        }
     }
 
     public EventDetailDTO getEventById(Integer id, HttpServletRequest request) {
@@ -182,7 +198,9 @@ public class EventService {
             List<Event> eventsListByEmail = repository.findByBookingEmail(getUserEmail);
             return listMapper.mapList(eventsListByEmail, EventDTO.class, modelMapper);
         } else if (userDetails != null && (request.isUserInRole("ROLE_lecturer"))) {
+//            List<Events> eventsListByEmail = repository.findByBookingEmail(getUserEmail);
             List<Event> eventListByCategoryOwner = repository.findEventCategoryOwnerByEmail(getUserEmail);
+
             return listMapper.mapList(eventListByCategoryOwner , EventDTO.class,modelMapper);
         }
         return listMapper.mapList(eventsList, EventDTO.class, modelMapper);

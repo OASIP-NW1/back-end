@@ -47,5 +47,4 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint{
             throw new ServletException();
         }
     }
-
 }

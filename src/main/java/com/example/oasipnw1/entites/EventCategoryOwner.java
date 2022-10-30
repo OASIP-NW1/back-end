@@ -1,12 +1,15 @@
 package com.example.oasipnw1.entites;
 
+
 import org.springframework.stereotype.Service;
+
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "EventCategoryOwner")
 public class EventCategoryOwner {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ownerID", nullable = false)
@@ -43,4 +46,6 @@ public class EventCategoryOwner {
     public void setId(Integer id) {
         this.id = id;
     }
+
 }
+

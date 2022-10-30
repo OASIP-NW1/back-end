@@ -1,7 +1,9 @@
 package com.example.oasipnw1;
 
+import com.example.oasipnw1.properties.FileStorageProperties;
 import com.example.oasipnw1.services.ListMapper;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,9 +16,9 @@ import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 
 //class ที่ช่วย map entity ให้เป็น dto
 @Configuration
-//@EnableConfigurationProperties({
-//        FileStorageProperties.class
-//})
+@EnableConfigurationProperties({
+        FileStorageProperties.class
+})
 public class ApplicationConfig {
     @Bean
     public ModelMapper modelMapper() {
