@@ -60,35 +60,38 @@ public class EventService {
     private EventCategoryOwnerRepository eventCategoryOwnerRepository;
     public Event save(@Valid HttpServletRequest request, Event event) {
         Event e = modelMapper.map(event, Event.class);
-        String getUserEmail = getUserEmail(getRequestAccessToken(request));
-        if (request.isUserInRole("student")) {
-            if (getUserEmail.equals(event.getBookingEmail())) {
-                System.out.println("Booking email same as the student's email!");
-            } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Booking email must be the same as the student's email");
+
+        if (request.getHeader("Authorization") != null) {
+            String getUserEmail = getUserEmail(getRequestAccessToken(request));
+
+            if (request.isUserInRole("student")) {
+                if (getUserEmail.equals(event.getBookingEmail())) {
+                    System.out.println("Booking email same as the student's email!");
+                } else {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Booking email must be the same as the student's email");
+                }
             }
-        }
-        try {
-            LocalDateTime localDateTime = e.getEventStartTime();
-            System.out.println(e.getEventCategory().getEventCategoryName());
-            String newformat = localDateTime.format(DateTimeFormatter.ofPattern("E MMM dd, yyyy HH:mm").withZone(ZoneId.of("UTC")));
-            String header = "You have made a new appointment ." + '\n';
-            String body =
-                            "Subject : [OASIP]" + " " + e.getEventCategory().getEventCategoryName() + " " + "@" + " " + newformat + " " + "-" + " " + findEndDate(e.getEventStartTime(),e.getEventDuration()).toString().substring(11) + " (ICT)" + '\n' +
-                            "Reply-to : " + "noreply@intproj21.sit.kmutt.ac.th" + '\n' +
-                            "Booking Name : " + e.getBookingName() + '\n' +
-                            "Event Category : " + e.getEventCategory().getEventCategoryName() + '\n' +
-                            "When : " + newformat + " " + "-" + " " + findEndDate(e.getEventStartTime(),e.getEventDuration()).toString().substring(11) + " (ICT)" + '\n' +
+            try {
+                LocalDateTime localDateTime = e.getEventStartTime();
+                System.out.println(e.getEventCategory().getEventCategoryName());
+                String newformat = localDateTime.format(DateTimeFormatter.ofPattern("E MMM dd, yyyy HH:mm").withZone(ZoneId.of("UTC")));
+                String header = "You have made a new appointment ." + '\n';
+                String body =
+                        "Subject : [OASIP]" + " " + e.getEventCategory().getEventCategoryName() + " " + "@" + " " + newformat + " " + "-" + " " + findEndDate(e.getEventStartTime(), e.getEventDuration()).toString().substring(11) + " (ICT)" + '\n' +
+                                "Reply-to : " + "noreply@intproj21.sit.kmutt.ac.th" + '\n' +
+                                "Booking Name : " + e.getBookingName() + '\n' +
+                                "Event Category : " + e.getEventCategory().getEventCategoryName() + '\n' +
+                                "When : " + newformat + " " + "-" + " " + findEndDate(e.getEventStartTime(), e.getEventDuration()).toString().substring(11) + " (ICT)" + '\n' +
 //                          "When : " + " " + e.getEventStartTime().toString().replace("T" , " ")+ " " + "-" + " " + findEndDate(e.getEventStartTime(),e.getEventDuration()).toString().substring(11) + '\n' +
 //                          "Event duration : " + e.getEventDuration() + "Minutes" + '\n' +
-                            "Event note : "  + e.getEventNote();
+                                "Event note : " + e.getEventNote();
 //            emailSerderService.sendSimpleMail(e.getBookingEmail(), header, body);
-            System.out.println("email sent succesfully");
-        } catch (Exception ex) {
-            System.out.println(ex);
-            System.out.println("email sent failed");
+                System.out.println("email sent succesfully");
+            } catch (Exception ex) {
+                System.out.println(ex);
+                System.out.println("email sent failed");
+            }
         }
-
         return repository.saveAndFlush(event);
     }
 
