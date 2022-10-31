@@ -48,7 +48,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                 .accessDeniedHandler(accessDeniedHandler())
                 .and()
-//               guset
+//               guest
                 .anonymous().principal("guest").authorities("ROLE_guest").and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 //                all role

@@ -12,6 +12,5 @@ public class UploadFileResponse {
         this.fileType = fileType;
         this.size = size;
     }
-
     // Getters and Setters (Omitted for brevity)
 }
