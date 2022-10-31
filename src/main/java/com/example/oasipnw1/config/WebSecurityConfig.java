@@ -53,6 +53,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 //                all role
                 .authorizeRequests()
+//                see category role guest -> edit
+//                .antMatchers("/api/eventCategory").hasRole("guest")
                 .antMatchers("/api/login","/api/users/signup").permitAll()
 //                admin
                 .antMatchers("/api/users/**","/api/match/**").hasRole("admin")
@@ -75,5 +77,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AccessDeniedHandler accessDeniedHandler(){
         return new CustomAccessDeniedHandler();
     }
-
 }

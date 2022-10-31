@@ -62,12 +62,12 @@ public class EventService {
     @Autowired
     private  FileStorageService fileStorageService;
 
-    public Event save(@Valid HttpServletRequest request, Event event , MultipartFile multipartFile) {
-        Event e = modelMapper.map(event, Event.class);
+    public Event save(@Valid HttpServletRequest request, @Valid EventDTO eventDTO , MultipartFile multipartFile) {
+        Event e = modelMapper.map(eventDTO, Event.class);
         if (request.getHeader("Authorization") != null) {
             String getUserEmail = getUserEmail(getRequestAccessToken(request));
             if (request.isUserInRole("student")) {
-                if (getUserEmail.equals(event.getBookingEmail())) {
+                if (getUserEmail.equals(eventDTO.getBookingEmail())) {
                     System.out.println("Booking email same as the student's email!");
                 } else {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Booking email must be the same as the student's email");
@@ -98,7 +98,7 @@ public class EventService {
             sendFile(multipartFile , saveEvent.getId());
         }
 //      เหลือ check error max file
-        return repository.saveAndFlush(event);
+        return repository.saveAndFlush(e);
     }
 
 // file
