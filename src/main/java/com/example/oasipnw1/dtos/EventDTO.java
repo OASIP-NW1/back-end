@@ -36,10 +36,10 @@ public class EventDTO {
 
     @Size(max = 500,message = "Notes size must between 0 and 500 character")
     private String eventNote;
+
     private EventCategoryDTO eventCategory;
 
     public String getEventCategoryName(EventDetailDTO eventDetailDTO) {
-
         return eventDetailDTO.getEventCategoryName();
     }
 }

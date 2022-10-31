@@ -33,11 +33,6 @@ public class EventController {
     public List<EventDTO> getAllSubject(HttpServletRequest httpServletRequest){
         return eventService.getAll(httpServletRequest);
     }
-
-    //    @GetMapping("/{id}")
-//    public EventDTO getEventById(@PathVariable Integer id){
-//        return eventService.getEventById(id);
-//    }
     @GetMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
     public EventDetailDTO getEventById(@PathVariable Integer id, HttpServletRequest request) {
@@ -56,8 +51,10 @@ public class EventController {
     @PostMapping("")
     @PreAuthorize("!isAuthenticated() or hasAnyRole(\"admin\",\"student\")")
 //    public void Event (@Valid HttpServletRequest request , @Valid @RequestBody Event event )
-    public void Event (@Valid HttpServletRequest request , @Valid @RequestPart Event event ,@RequestPart(value = "file" , required = false) MultipartFile multipartFile) {
-        eventService.save(request,event,multipartFile);
+    public void EventDTO (@Valid HttpServletRequest request ,
+                          @Valid @RequestPart EventDTO eventDTO ,
+                          @RequestPart(value = "file" , required = false) MultipartFile multipartFile) {
+        eventService.save(request,eventDTO,multipartFile);
     }
 
     @DeleteMapping("/{id}")
