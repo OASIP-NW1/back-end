@@ -14,9 +14,8 @@ import java.time.ZonedDateTime;
 @Setter
 public class EventUpdateDTO {
 
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @NotNull(message = "StartTime cannot null")
-    @Future(message = "StartTime must be a future date")
     private LocalDateTime eventStartTime;
 
     @Size(max = 500,message = "Notes size must between 0 and 500 character")
