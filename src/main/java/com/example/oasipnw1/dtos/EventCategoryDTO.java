@@ -20,7 +20,7 @@ public class EventCategoryDTO {
     @Size(max = 100, message = "eventCategoryName Must not exceed 100 characters.")
     public String eventCategoryName;
 
-    @JsonIgnore
+//    @JsonIgnore
     private String eventCategoryDescription;
 
     private Integer eventDuration;
