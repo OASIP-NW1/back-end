@@ -8,22 +8,30 @@ import com.example.oasipnw1.dtos.EventUpdateDTO;
 import com.example.oasipnw1.entites.Event;
 import com.example.oasipnw1.entites.EventCategory;
 import com.example.oasipnw1.entites.User;
+import com.example.oasipnw1.model.HandleException;
 import com.example.oasipnw1.repository.EventCategoryOwnerRepository;
+import com.example.oasipnw1.repository.EventCategoryRepository;
 import com.example.oasipnw1.repository.EventRepository;
 import com.example.oasipnw1.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.util.unit.DataSize;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -32,38 +40,76 @@ import java.util.List;
 
 
 @Service
-
 public class EventService {
-
     @Autowired
     private ListMapper listMapper;
-
     @Autowired
     private ModelMapper modelMapper;
-
     @Autowired
     private EventRepository repository;
-
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-
     @Autowired
     private JwtUserDetailsService jwtuserDetailsService;
-//
-//    @Autowired
-//    private EmailSerderService emailSerderService;
-
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private EventCategoryOwnerRepository eventCategoryOwnerRepository;
-
     @Autowired
     private  FileStorageService fileStorageService;
+//    @Autowired
+    private EventCategoryRepository eventCategoryRepository;
+     public EventService(EventCategoryRepository eventCategoryRepository) {
+        this.eventCategoryRepository = eventCategoryRepository;
+     }
 
-    public Event save(@Valid HttpServletRequest request, @Valid EventDTO eventDTO , MultipartFile multipartFile) {
-        Event e = modelMapper.map(eventDTO, Event.class);
+    public Event save(@Valid HttpServletRequest request, @Valid EventDTO eventDTO , MultipartFile multipartFile) throws IOException {
+//          file
+        Event et = new Event();
+        EventCategory ec = new EventCategory();
+//        overlap
+        LocalDateTime newEventStartTime = eventDTO.getEventStartTime();
+        LocalDateTime newEventEndTime = findEndDate(eventDTO.getEventStartTime(), eventDTO.getEventDuration());
+        List<EventDTO> eventList = getAllEvent();
+
+        for (int i = 0; i < eventList.size(); i++) {
+            LocalDateTime eventStartTime = eventList.get(i).getEventStartTime();
+            if(eventStartTime.isEqual(newEventStartTime)){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
+            }else {
+                LocalDateTime eventEndTime = findEndDate(eventList.get(i).getEventStartTime(),
+                        eventList.get(i).getEventDuration());
+                if (newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventStartTime) ||
+                        newEventStartTime.isBefore(eventEndTime) && newEventEndTime.isAfter(eventEndTime) ||
+                        newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventEndTime) ||
+                        newEventStartTime.isAfter(eventStartTime) && newEventEndTime.isBefore(eventEndTime)
+                        || newEventStartTime.equals(eventStartTime)) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
+                }
+            }
+        }
+
+//            eventCategory
+        ec.setId(eventDTO.getEventCategory().getId());
+        ec.setEventCategoryName(eventDTO.getEventCategory().getEventCategoryName());
+        ec.setEventCategoryDescription(eventDTO.getEventCategory().getEventCategoryDescription());
+        ec.setEventDuration(eventDTO.getEventCategory().getEventDuration());
+
+//          event
+        et.setBookingName(eventDTO.getBookingName());
+        et.setBookingEmail(eventDTO.getBookingEmail());
+        et.setEventNote(eventDTO.getEventNote());
+        et.setEventStartTime(eventDTO.getEventStartTime());
+        et.setEventDuration(eventDTO.getEventDuration());
+        et.setEventCategory(ec);
+//        et.setFileName(StringUtils.cleanPath(multipartFile.getOriginalFilename()));
+//        et.getFileData(multipartFile.getBytes());
+
+        if (multipartFile != null) {
+            et.setFileName(StringUtils.cleanPath(multipartFile.getOriginalFilename()));
+            et.setFileData(multipartFile.getBytes());
+        }
+
+        Event e = modelMapper.map(et, Event.class);
+
         if (request.getHeader("Authorization") != null) {
             String getUserEmail = getUserEmail(getRequestAccessToken(request));
             if (request.isUserInRole("student")) {
@@ -87,17 +133,19 @@ public class EventService {
 //                          "When : " + " " + e.getEventStartTime().toString().replace("T" , " ")+ " " + "-" + " " + findEndDate(e.getEventStartTime(),e.getEventDuration()).toString().substring(11) + '\n' +
 //                          "Event duration : " + e.getEventDuration() + "Minutes" + '\n' +
                                 "Event note : " + e.getEventNote();
-//            emailSerderService.sendSimpleMail(e.getBookingEmail(), header, body);
                 System.out.println("email sent succesfully");
             } catch (Exception ex) {
                 System.out.println(ex);
                 System.out.println("email sent failed");
             }
-//            getId send file
+
+//          getId send file
             Event saveEvent = repository.saveAndFlush(e);
             sendFile(multipartFile , saveEvent.getId());
         }
+
 //      เหลือ check error max file
+//        MaxUploadSizeExceededException maxUploadSizeExceededException;
         return repository.saveAndFlush(e);
     }
 
@@ -106,12 +154,16 @@ public class EventService {
         try {
             if (multipartFile != null){
                 fileStorageService.storeFile(multipartFile , id);
+                System.out.println("store success");
             }
-        }catch (Exception e){
-            System.out.println(e);
+        }catch (IOException ioException){
+            ioException.printStackTrace();
+//            System.out.println(e);
+        }catch (MaxUploadSizeExceededException maxUploadSizeExceededException){
+            System.out.println(maxUploadSizeExceededException);
+            throw new HandleException(HttpStatus.BAD_REQUEST,"File Upload");
         }
     }
-
     public EventDetailDTO getEventById(Integer id, HttpServletRequest request) {
         Event events = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can't get event, event id " + id +
@@ -178,6 +230,27 @@ public class EventService {
     public EventUpdateDTO updateEvent(EventUpdateDTO updateEvent, Integer id) {
         Event event = repository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, id + "does not exist!!!"));
+        //        overlap
+        LocalDateTime newEventStartTime = updateEvent.getEventStartTime();
+        LocalDateTime newEventEndTime = findEndDate(updateEvent.getEventStartTime(), event.getEventDuration());
+        List<EventDTO> eventList = getAllEvent();
+
+        for (int i = 0; i < eventList.size(); i++) {
+            LocalDateTime eventStartTime = eventList.get(i).getEventStartTime();
+            if(eventStartTime.isEqual(newEventStartTime)){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
+            }else {
+                LocalDateTime eventEndTime = findEndDate(eventList.get(i).getEventStartTime(),
+                        eventList.get(i).getEventDuration());
+                if (newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventStartTime) ||
+                        newEventStartTime.isBefore(eventEndTime) && newEventEndTime.isAfter(eventEndTime) ||
+                        newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventEndTime) ||
+                        newEventStartTime.isAfter(eventStartTime) && newEventEndTime.isBefore(eventEndTime)
+                        || newEventStartTime.equals(eventStartTime)) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
+                }
+            }
+        }
         event.setEventStartTime(updateEvent.getEventStartTime());
         event.setEventNote(updateEvent.getEventNote());
         repository.saveAndFlush(event);
