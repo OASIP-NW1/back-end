@@ -34,11 +34,11 @@ public class Response {
     private String maxFiles;
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    @ResponseStatus(value = HttpStatus.PAYLOAD_TOO_LARGE)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ResponseEntity handleMultipartException(MaxUploadSizeExceededException maxUploadSizeExceededException){
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("timestamp",new Date());
-        map.put("status",HttpStatus.PAYLOAD_TOO_LARGE.value());
+        map.put("status",HttpStatus.BAD_REQUEST.value());
         map.put("error",HttpStatus.PAYLOAD_TOO_LARGE.name());
         map.put("message","The file size cannot be larger than 10 MB.");
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(map);
