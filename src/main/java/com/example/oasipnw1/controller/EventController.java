@@ -5,6 +5,7 @@ import com.example.oasipnw1.entites.Event;
 import com.example.oasipnw1.entites.EventCategory;
 import com.example.oasipnw1.repository.EventRepository;
 //import com.example.oasipnw1.services.EmailSerderService;
+import com.example.oasipnw1.services.EmailSerderService;
 import com.example.oasipnw1.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -22,12 +27,14 @@ import java.util.List;
 public class EventController {
     @Autowired
     EventService eventService;
-
     @Autowired
     private EventRepository eventRepository;
 
     @Autowired
     private EventCategory eventCategory;
+
+    @Autowired
+    private EmailSerderService serderService;
 
     @GetMapping("")
     public List<EventDTO> getAllSubject(HttpServletRequest httpServletRequest){
@@ -53,7 +60,8 @@ public class EventController {
 //    public void Event (@Valid HttpServletRequest request , @Valid @RequestBody Event event )
     public void EventDTO (@Valid HttpServletRequest request ,
                           @Valid @RequestPart EventDTO eventDTO ,
-                          @RequestPart(value = "file" , required = false) MultipartFile multipartFile) {
+                          @RequestPart(value = "file" , required = false) MultipartFile multipartFile) throws IOException {
+//        serderService.sendSimpleMail(eventDTO.getBookingEmail() , eventService. , body);
         eventService.save(request,eventDTO,multipartFile);
     }
 
@@ -65,19 +73,6 @@ public class EventController {
         eventRepository.deleteById(id);
     }
 
-//    @PutMapping("/{id}")
-//    @ResponseStatus(code = HttpStatus.OK)
-//    public void update(@Valid @RequestBody Event updateEvent,
-//                       @PathVariable Integer id) {
-//        Event event = eventRepository.findById(id)
-//                .map(o -> mapEvent(o, updateEvent))
-//                .orElseGet(() -> {
-//                    updateEvent.setId(id);
-//                    return updateEvent;
-//                });
-//        eventService.save (event);
-//    }
-
     @PutMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
     public EventUpdateDTO updateEvent(@Valid @RequestBody EventUpdateDTO updateEvent,
@@ -85,10 +80,4 @@ public class EventController {
         return eventService.updateEvent(updateEvent,id);
 
     }
-
-//    private Event mapEvent(Event existingEvent , Event updateEvent){
-//        existingEvent.setEventStartTime(updateEvent.getEventStartTime());
-//        existingEvent.setEventNote(updateEvent.getEventNote());
-//        return existingEvent;
-//    }
 }
