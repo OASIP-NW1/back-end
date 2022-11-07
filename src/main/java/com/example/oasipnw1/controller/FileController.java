@@ -1,6 +1,5 @@
 package com.example.oasipnw1.controller;
 
-import com.example.oasipnw1.payload.UploadFileResponse;
 import com.example.oasipnw1.services.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,15 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/downloadFile")
 public class FileController {
@@ -30,6 +20,7 @@ public class FileController {
     @Autowired
     private  FileController fileController;
 
+//    @GetMapping("/{id}/{fileCode}")
     @GetMapping("/{id}/{fileCode}")
 //    filecode = namefile download
 
