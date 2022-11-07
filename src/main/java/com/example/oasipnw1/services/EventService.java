@@ -55,11 +55,13 @@ public class EventService {
     private UserRepository userRepository;
     @Autowired
     private  FileStorageService fileStorageService;
-//    @Autowired
+    @Autowired
+    private EmailSerderService serderService;
+    //    @Autowired
     private EventCategoryRepository eventCategoryRepository;
-     public EventService(EventCategoryRepository eventCategoryRepository) {
+    public EventService(EventCategoryRepository eventCategoryRepository) {
         this.eventCategoryRepository = eventCategoryRepository;
-     }
+    }
 
     public Event save(@Valid HttpServletRequest request, @Valid EventDTO eventDTO , MultipartFile multipartFile) throws IOException {
 //          file
@@ -109,7 +111,6 @@ public class EventService {
         }
 
         Event e = modelMapper.map(et, Event.class);
-
         if (request.getHeader("Authorization") != null) {
             String getUserEmail = getUserEmail(getRequestAccessToken(request));
             if (request.isUserInRole("student")) {
@@ -149,7 +150,7 @@ public class EventService {
         return repository.saveAndFlush(e);
     }
 
-// file
+    // file
     public void sendFile(MultipartFile multipartFile , Integer id){
         try {
             if (multipartFile != null){

@@ -31,6 +31,28 @@ public class Event {
     @JoinColumn(name = "eventCategoryId", nullable = false)
     private EventCategory eventCategory;
 
+    @Column(name = "fileName", length = 500)
+    private String fileName;
+
+    @Column(name = "fileData")
+    private byte[] fileData;
+
+    public byte[] getFileData() {
+        return fileData;
+    }
+
+    public void setFileData(byte[] fileData) {
+        this.fileData = fileData;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
     public EventCategory getEventCategory() {
         return eventCategory;
     }

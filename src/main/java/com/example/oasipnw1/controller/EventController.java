@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -53,7 +54,7 @@ public class EventController {
 //    public void Event (@Valid HttpServletRequest request , @Valid @RequestBody Event event )
     public void EventDTO (@Valid HttpServletRequest request ,
                           @Valid @RequestPart EventDTO eventDTO ,
-                          @RequestPart(value = "file" , required = false) MultipartFile multipartFile) {
+                          @RequestPart(value = "file" , required = false) MultipartFile multipartFile) throws IOException {
         eventService.save(request,eventDTO,multipartFile);
     }
 
