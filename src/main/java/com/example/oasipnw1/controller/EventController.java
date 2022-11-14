@@ -7,6 +7,7 @@ import com.example.oasipnw1.repository.EventRepository;
 //import com.example.oasipnw1.services.EmailSerderService;
 import com.example.oasipnw1.services.EmailSerderService;
 import com.example.oasipnw1.services.EventService;
+import com.example.oasipnw1.services.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,6 +36,9 @@ public class EventController {
 
     @Autowired
     private EmailSerderService serderService;
+
+    @Autowired
+    private FileStorageService fileStorageService;
 
     @GetMapping("")
     public List<EventDTO> getAllSubject(HttpServletRequest httpServletRequest){
@@ -69,6 +73,7 @@ public class EventController {
         eventRepository.findById(id).orElseThrow(()->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         id + " does not exist !!!"));
+        fileStorageService.Deletefile(id);
         eventRepository.deleteById(id);
     }
 
@@ -81,11 +86,4 @@ public class EventController {
         return eventService.updateEvent(updateEvent,id,multipartFile,request);
 
     }
-//@PutMapping("/{id}")
-//@ResponseStatus(code = HttpStatus.OK)
-//public Event updateEvent(@Valid @RequestPart EventUpdateDTO updateEvent,
-//                                  @PathVariable Integer id) {
-//    return eventService.updateEvent(updateEvent,id);
-//
-//}
 }
