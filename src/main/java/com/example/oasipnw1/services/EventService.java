@@ -234,7 +234,7 @@ public class EventService {
                 EventPageDTO.class);
     }
 
-    public EventUpdateDTO updateEvent(EventUpdateDTO updateEvent, Integer id) {
+    public EventUpdateDTO updateEvent(EventUpdateDTO updateEvent, Integer id, MultipartFile multipartFile) throws IOException {
         Event event = repository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, id + "does not exist!!!"));
         //        overlap
@@ -258,8 +258,12 @@ public class EventService {
                 }
             }
         }
+
         event.setEventStartTime(updateEvent.getEventStartTime());
         event.setEventNote(updateEvent.getEventNote());
+        event.setFileData(updateEvent.getFileData());
+        event.setFileName(updateEvent.getFileName());
+
         repository.saveAndFlush(event);
         return updateEvent;
     }

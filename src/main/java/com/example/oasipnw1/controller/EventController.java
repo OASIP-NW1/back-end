@@ -74,8 +74,9 @@ public class EventController {
     @PutMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
     public EventUpdateDTO updateEvent(@Valid @RequestBody EventUpdateDTO updateEvent,
-                                      @PathVariable Integer id) {
-        return eventService.updateEvent(updateEvent,id);
+                                      @PathVariable Integer id,
+                                      @RequestPart(value = "file" , required = false) MultipartFile multipartFile) throws IOException {
+        return eventService.updateEvent(updateEvent,id,multipartFile);
 
     }
 }
