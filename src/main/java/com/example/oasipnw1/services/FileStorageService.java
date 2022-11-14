@@ -78,4 +78,10 @@ public class FileStorageService {
             throw new MyFileNotFoundException("File not found " + fileName, ex);
         }
     }
+
+    public Path getPathFile(Integer id) {
+        Path pathbyid = Paths.get(this.fileStorageLocation + "/" + id);
+//        return id;
+        return pathbyid;
+    }
 }

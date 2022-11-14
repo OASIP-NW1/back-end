@@ -3,6 +3,7 @@ package com.example.oasipnw1.dtos;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.validation.constraints.*;
@@ -38,6 +39,7 @@ public class EventDTO {
     private String eventNote;
 
     private EventCategoryDTO eventCategory;
+    private MultipartFile File;
 
     public String getEventCategoryName(EventDetailDTO eventDetailDTO) {
         return eventDetailDTO.getEventCategoryName();

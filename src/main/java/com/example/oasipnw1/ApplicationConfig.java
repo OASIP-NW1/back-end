@@ -1,6 +1,8 @@
 package com.example.oasipnw1;
 
 import com.example.oasipnw1.properties.FileStorageProperties;
+import com.example.oasipnw1.repository.EventCategoryRepository;
+import com.example.oasipnw1.services.EventService;
 import com.example.oasipnw1.services.ListMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

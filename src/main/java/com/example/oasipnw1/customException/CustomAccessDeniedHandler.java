@@ -26,28 +26,12 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         errors.put("status", response.getStatus());
         errors.put("error", "FORBIDDEN");
         errors.put("message", "Access Denied");
-        try{
+        try {
             ObjectMapper mapper = new ObjectMapper();
             mapper.writeValue(response.getOutputStream(), errors);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new ServletException();
         }
 
     }
 }
-
-//   logger.error("Unauthorized error: {}", authException.getMessage());
-//final Map<String, Object> errors = new LinkedHashMap<>();
-//
-//        response.setContentType("application/json");
-//        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//        errors.put("timestamp", ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-//        errors.put("status", response.getStatus());
-//        errors.put("error", "UNAUTHORIZED");
-//        errors.put("message", request.getAttribute("Errors"));
-//        try{
-//        ObjectMapper mapper = new ObjectMapper();
-//        mapper.writeValue(response.getOutputStream(), errors);
-//        }catch (Exception e){
-//        throw new ServletException();
-//        }

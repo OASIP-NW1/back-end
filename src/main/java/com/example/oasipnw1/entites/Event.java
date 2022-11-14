@@ -1,10 +1,14 @@
 package com.example.oasipnw1.entites;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "Event")
 public class Event {
     @Id
@@ -27,6 +31,8 @@ public class Event {
     @Column(name = "eventDuration", nullable = false)
     private Integer eventDuration;
 
+    @Column(name = "fileName")
+    private String fileName;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "eventCategoryId", nullable = false)
     private EventCategory eventCategory;
@@ -85,5 +91,13 @@ public class Event {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }

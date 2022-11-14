@@ -61,7 +61,6 @@ public class EventController {
     public void EventDTO (@Valid HttpServletRequest request ,
                           @Valid @RequestPart EventDTO eventDTO ,
                           @RequestPart(value = "file" , required = false) MultipartFile multipartFile) throws IOException {
-//        serderService.sendSimpleMail(eventDTO.getBookingEmail() , eventService. , body);
         eventService.save(request,eventDTO,multipartFile);
     }
 
@@ -75,9 +74,18 @@ public class EventController {
 
     @PutMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
-    public EventUpdateDTO updateEvent(@Valid @RequestBody EventUpdateDTO updateEvent,
-                                      @PathVariable Integer id) {
-        return eventService.updateEvent(updateEvent,id);
+    public EventUpdateDTO updateEvent(@Valid @RequestPart EventUpdateDTO updateEvent,
+                                      @PathVariable Integer id,
+                                      @RequestPart(value = "file" , required = false) MultipartFile multipartFile,
+                                      HttpServletRequest request) throws IOException {
+        return eventService.updateEvent(updateEvent,id,multipartFile,request);
 
     }
+//@PutMapping("/{id}")
+//@ResponseStatus(code = HttpStatus.OK)
+//public Event updateEvent(@Valid @RequestPart EventUpdateDTO updateEvent,
+//                                  @PathVariable Integer id) {
+//    return eventService.updateEvent(updateEvent,id);
+//
+//}
 }

@@ -24,7 +24,6 @@ public class JwtUserDetailsService implements UserDetailsService {
         this.argon2PasswordEncoder = argon2PasswordEncoder;
     }
 
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = repository.findByEmail(username);

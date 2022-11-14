@@ -40,7 +40,7 @@ public class Response {
         map.put("timestamp",new Date());
         map.put("status",HttpStatus.BAD_REQUEST.value());
         map.put("error",HttpStatus.PAYLOAD_TOO_LARGE.name());
-        map.put("message","The file size cannot be larger than 10 MB.");
+        map.put("message","The file size cannot be larger than " + maxFiles);
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(map);
     }
 }
