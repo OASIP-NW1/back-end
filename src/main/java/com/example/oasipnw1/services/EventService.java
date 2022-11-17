@@ -5,18 +5,16 @@ import com.example.oasipnw1.dtos.EventDTO;
 import com.example.oasipnw1.dtos.EventDetailDTO;
 import com.example.oasipnw1.dtos.EventPageDTO;
 import com.example.oasipnw1.dtos.EventUpdateDTO;
-import com.example.oasipnw1.emails.EmailService;
 import com.example.oasipnw1.entites.Event;
 import com.example.oasipnw1.entites.EventCategory;
 import com.example.oasipnw1.entites.User;
 import com.example.oasipnw1.model.HandleException;
-import com.example.oasipnw1.repository.EventCategoryOwnerRepository;
 import com.example.oasipnw1.repository.EventCategoryRepository;
 import com.example.oasipnw1.repository.EventRepository;
 import com.example.oasipnw1.repository.UserRepository;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -24,15 +22,16 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.util.unit.DataSize;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -55,7 +54,7 @@ public class EventService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private  FileStorageService fileStorageService;
+    private FileStorageService fileStorageService;
 
     @Autowired
     private EmailSerderService serderService;
@@ -66,7 +65,7 @@ public class EventService {
         this.eventCategoryRepository = eventCategoryRepository;
     }
 
-    public Event save(@Valid HttpServletRequest request, @Valid EventDTO eventDTO , MultipartFile multipartFile) throws IOException {
+    public Event save(@Valid HttpServletRequest request, @Valid EventDTO eventDTO, MultipartFile multipartFile) throws IOException {
 //          file
         Event et = new Event();
         EventCategory ec = new EventCategory();
@@ -77,9 +76,9 @@ public class EventService {
 
         for (int i = 0; i < eventList.size(); i++) {
             LocalDateTime eventStartTime = eventList.get(i).getEventStartTime();
-            if(eventStartTime.isEqual(newEventStartTime)){
+            if (eventStartTime.isEqual(newEventStartTime)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
-            }else {
+            } else {
                 LocalDateTime eventEndTime = findEndDate(eventList.get(i).getEventStartTime(),
                         eventList.get(i).getEventDuration());
                 if (newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventStartTime) ||
@@ -92,13 +91,13 @@ public class EventService {
             }
         }
 
-//      eventCategory
+//            eventCategory
         ec.setId(eventDTO.getEventCategory().getId());
         ec.setEventCategoryName(eventDTO.getEventCategory().getEventCategoryName());
         ec.setEventCategoryDescription(eventDTO.getEventCategory().getEventCategoryDescription());
         ec.setEventDuration(eventDTO.getEventCategory().getEventDuration());
 
-//      event
+//          event
         et.setBookingName(eventDTO.getBookingName());
         et.setBookingEmail(eventDTO.getBookingEmail());
         et.setEventNote(eventDTO.getEventNote());
@@ -108,10 +107,8 @@ public class EventService {
 //        et.setFileName(StringUtils.cleanPath(multipartFile.getOriginalFilename()));
 //        et.getFileData(multipartFile.getBytes());
 
-//        add filedata + filename in database
         if (multipartFile != null) {
             et.setFileName(StringUtils.cleanPath(multipartFile.getOriginalFilename()));
-            et.setFileData(multipartFile.getBytes());
         }
 
         Event e = modelMapper.map(et, Event.class);
@@ -130,7 +127,7 @@ public class EventService {
                 LocalDateTime localDateTime = e.getEventStartTime();
                 System.out.println("Bookingemail" + " : " + e.getBookingEmail());
                 System.out.println("Bookingname" + " : " + e.getBookingName());
-                System.out.println("Category" + " : " +e.getEventCategory().getEventCategoryName());
+                System.out.println("Category" + " : " + e.getEventCategory().getEventCategoryName());
                 String newformat = localDateTime.format(DateTimeFormatter.ofPattern("E MMM dd, yyyy HH:mm")
                         .withZone(ZoneId.of("UTC")));
                 String header = "You have made a new appointment ." + '\n';
@@ -144,7 +141,7 @@ public class EventService {
                                 "When : " + newformat + " " + "-" + " " + findEndDate(e.getEventStartTime(),
                                 e.getEventDuration()).toString().substring(11) + " (ICT)" + '\n' +
                                 "Event note : " + e.getEventNote();
-                serderService.sendSimpleMail(eventDTO.getBookingEmail(),header,body);
+                serderService.sendSimpleMail(eventDTO.getBookingEmail(), header, body);
                 System.out.println("Message Email : " + "Email Sent Succesfully");
             } catch (Exception ex) {
                 System.out.println(ex);
@@ -152,26 +149,27 @@ public class EventService {
             }
 //          getId send file
             Event saveEvent = repository.saveAndFlush(e);
-            sendFile(multipartFile , saveEvent.getId());
+            sendFile(multipartFile, saveEvent.getId());
         }
         return repository.saveAndFlush(e);
     }
 
     // file
-    public void sendFile(MultipartFile multipartFile , Integer id){
+    public void sendFile(MultipartFile multipartFile, Integer id) {
         try {
-            if (multipartFile != null){
-                fileStorageService.storeFile(multipartFile , id);
+            if (multipartFile != null) {
+                fileStorageService.storeFile(multipartFile, id);
                 System.out.println("store success");
             }
-        }catch (IOException ioException){
+        } catch (IOException ioException) {
             ioException.printStackTrace();
 //            System.out.println(e);
-        }catch (MaxUploadSizeExceededException maxUploadSizeExceededException){
+        } catch (MaxUploadSizeExceededException maxUploadSizeExceededException) {
             System.out.println(maxUploadSizeExceededException);
-            throw new HandleException(HttpStatus.BAD_REQUEST,"File Upload");
+            throw new HandleException(HttpStatus.BAD_REQUEST, "File Upload");
         }
     }
+
     public EventDetailDTO getEventById(Integer id, HttpServletRequest request) {
         Event events = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can't get event, event id " + id +
@@ -186,17 +184,17 @@ public class EventService {
                 System.out.println("Booking email must be the same as the student's email!");
                 throw new AccessDeniedException("");
             }
-        }else if(request.isUserInRole("lecturer")){
+        } else if (request.isUserInRole("lecturer")) {
             ArrayList<EventCategory> listCategory = new ArrayList<>();
             List<Event> eventsListByCategoryOwner = repository.findEventCategoryOwnerByEmail(getUserEmail);
             System.out.println(eventsListByCategoryOwner);
-            for(Event event : eventsListByCategoryOwner){
+            for (Event event : eventsListByCategoryOwner) {
                 listCategory.add(event.getEventCategory());
             }
-            if(listCategory.contains(events.getEventCategory())){
+            if (listCategory.contains(events.getEventCategory())) {
                 System.out.println("Yes Owner");
-                return modelMapper.map(events,EventDetailDTO.class);
-            }else{
+                return modelMapper.map(events, EventDetailDTO.class);
+            } else {
                 System.out.println("No owner");
                 throw new AccessDeniedException("");
             }
@@ -234,39 +232,78 @@ public class EventService {
                 EventPageDTO.class);
     }
 
-    public EventUpdateDTO updateEvent(EventUpdateDTO updateEvent, Integer id, MultipartFile multipartFile) throws IOException {
-        Event event = repository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, id + "does not exist!!!"));
-        //        overlap
-        LocalDateTime newEventStartTime = updateEvent.getEventStartTime();
-        LocalDateTime newEventEndTime = findEndDate(updateEvent.getEventStartTime(), event.getEventDuration());
-        List<EventDTO> eventList = getAllEvent();
 
-        for (int i = 0; i < eventList.size(); i++) {
-            LocalDateTime eventStartTime = eventList.get(i).getEventStartTime();
-            if(eventStartTime.isEqual(newEventStartTime)){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
-            }else {
-                LocalDateTime eventEndTime = findEndDate(eventList.get(i).getEventStartTime(),
-                        eventList.get(i).getEventDuration());
-                if (newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventStartTime) ||
-                        newEventStartTime.isBefore(eventEndTime) && newEventEndTime.isAfter(eventEndTime) ||
-                        newEventStartTime.isBefore(eventStartTime) && newEventEndTime.isAfter(eventEndTime) ||
-                        newEventStartTime.isAfter(eventStartTime) && newEventEndTime.isBefore(eventEndTime)
-                        || newEventStartTime.equals(eventStartTime)) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time is overlapping");
+    public EventUpdateDTO updateEvent(EventUpdateDTO updateEvent,
+                                      Integer id, MultipartFile multipartFile,
+                                      HttpServletRequest request) throws IOException {
+        Event event = repository.findById(id).map(events -> {
+            events.setEventNote(updateEvent.getEventNote());
+            events.setEventStartTime(updateEvent.getEventStartTime());
+            return events;
+        }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can't update event, event id" + id + "doesn't exist."));
+        if (request.isUserInRole("student")) {
+            System.out.println("Booking email same as the student's email!!!");
+            repository.saveAndFlush(event);
+        } else {
+            System.out.println("Booking email must be the same as student's email!!!");
+            throw new AccessDeniedException("");
+        }
+        //  file
+        Path getPath = fileStorageService.getPathFile(id);
+        System.out.println("new path: " + getPath);
+        File directoryPath = new File(getPath.toString());
+        File[] files = directoryPath.listFiles();
+
+        if (multipartFile == null && directoryPath.isDirectory() == false) {
+            repository.saveAndFlush(event);
+            return updateEvent;
+        }
+        if (directoryPath.isDirectory() == true) {
+            if (multipartFile == null) {
+                System.out.println("file is null");
+                System.out.println("This is delete file");
+                //  check file in folder
+                for (File f : files) {
+                    if (f.isFile() && f.exists()) {
+                        FileUtils.deleteDirectory(new File(getPath.toString()));
+                        System.out.println(f.getName());
+                        System.out.println("successfully deleted");
+                    } else {
+                        System.out.println("can't delete a file due to open or error");
+                    }
+                }
+            } else {
+                directoryPath.isDirectory();
+                System.out.println("directory: " + directoryPath.isDirectory());
+                String fileName = null;
+                for (File file1 : files) {
+                    if (file1.isFile()) {
+                        fileName = file1.getName();
+                    }
+                }
+                System.out.println("same file: " + fileName);
+                System.out.println("current file: " + multipartFile.getOriginalFilename());
+                System.out.println("check same file: " + multipartFile.getOriginalFilename().equals(fileName));
+                if (multipartFile.getOriginalFilename().isEmpty()) {
+                    System.out.println("Equal file name");
+                } else {
+                    System.out.println("No equal file name");
+                    if (Files.exists(Path.of(getPath.toString()))) {
+                        FileUtils.cleanDirectory(new File(getPath.toString()));
+                        System.out.println("have file");
+                        fileStorageService.storeFile(multipartFile, id);
+                    }
+                    fileStorageService.storeFile(multipartFile, id);
                 }
             }
+        } else {
+            Files.createDirectories(directoryPath.toPath());
+            fileStorageService.storeFile(multipartFile, id);
         }
-
-        event.setEventStartTime(updateEvent.getEventStartTime());
-        event.setEventNote(updateEvent.getEventNote());
-        event.setFileData(updateEvent.getFileData());
-        event.setFileName(updateEvent.getFileName());
-
         repository.saveAndFlush(event);
-        return updateEvent;
+        return  updateEvent;
     }
+
 
     public User getUserFromRequest(HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7);

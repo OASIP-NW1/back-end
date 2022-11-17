@@ -3,6 +3,7 @@ package com.example.oasipnw1.services;
 import com.example.oasipnw1.exception.FileStorageException;
 import com.example.oasipnw1.exception.MyFileNotFoundException;
 import com.example.oasipnw1.properties.FileStorageProperties;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -77,5 +78,19 @@ public class FileStorageService {
         } catch (MalformedURLException ex) {
             throw new MyFileNotFoundException("File not found " + fileName, ex);
         }
+    }
+
+    public Path getPathFile(Integer id) {
+        Path pathbyid = Paths.get(this.fileStorageLocation + "/" + id);
+//        return id;
+        return pathbyid;
+    }
+//    delete file
+    public void Deletefile(Integer id){
+       try{
+           FileUtils.deleteDirectory(new File(getPathFile(id).toUri()));
+       } catch (IOException e) {
+           throw new RuntimeException(e);
+       }
     }
 }

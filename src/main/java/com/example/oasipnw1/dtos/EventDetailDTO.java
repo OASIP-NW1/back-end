@@ -3,6 +3,7 @@ package com.example.oasipnw1.dtos;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -24,4 +25,5 @@ public class EventDetailDTO {
     private String eventNote;
     private Integer eventCategoryId;
     private String eventCategoryName;
+    private String fileName;
 }

@@ -7,6 +7,7 @@ import com.example.oasipnw1.repository.EventRepository;
 //import com.example.oasipnw1.services.EmailSerderService;
 import com.example.oasipnw1.services.EmailSerderService;
 import com.example.oasipnw1.services.EventService;
+import com.example.oasipnw1.services.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +18,9 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -33,10 +37,14 @@ public class EventController {
     @Autowired
     private EmailSerderService serderService;
 
+    @Autowired
+    private FileStorageService fileStorageService;
+
     @GetMapping("")
     public List<EventDTO> getAllSubject(HttpServletRequest httpServletRequest){
         return eventService.getAll(httpServletRequest);
     }
+
     @GetMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
     public EventDetailDTO getEventById(@PathVariable Integer id, HttpServletRequest request) {
@@ -58,8 +66,6 @@ public class EventController {
     public void EventDTO (@Valid HttpServletRequest request ,
                           @Valid @RequestPart EventDTO eventDTO ,
                           @RequestPart(value = "file" , required = false) MultipartFile multipartFile) throws IOException {
-//        serderService.sendSimpleMail(eventDTO.getBookingEmail() , eventService. , body);
-
         eventService.save(request,eventDTO,multipartFile);
     }
 
@@ -68,15 +74,17 @@ public class EventController {
         eventRepository.findById(id).orElseThrow(()->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         id + " does not exist !!!"));
+        fileStorageService.Deletefile(id);
         eventRepository.deleteById(id);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
-    public EventUpdateDTO updateEvent(@Valid @RequestBody EventUpdateDTO updateEvent,
+    public EventUpdateDTO updateEvent(@Valid @RequestPart EventUpdateDTO updateEvent,
                                       @PathVariable Integer id,
-                                      @RequestPart(value = "file" , required = false) MultipartFile multipartFile) throws IOException {
-        return eventService.updateEvent(updateEvent,id,multipartFile);
+                                      @RequestPart(value = "file" , required = false) MultipartFile multipartFile,
+                                      HttpServletRequest request) throws IOException {
+        return eventService.updateEvent(updateEvent,id,multipartFile,request);
 
     }
 }
