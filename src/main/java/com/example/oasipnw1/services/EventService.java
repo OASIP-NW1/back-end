@@ -239,6 +239,8 @@ public class EventService {
         Event event = repository.findById(id).map(events -> {
             events.setEventNote(updateEvent.getEventNote());
             events.setEventStartTime(updateEvent.getEventStartTime());
+            events.setFileName(updateEvent.getFileName());
+//            events.getFileName(updateEvent.getFileName(multipartFile.getOriginalFilename()));
             return events;
         }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can't update event, event id" + id + "doesn't exist."));
         if (request.isUserInRole("student")) {
@@ -292,16 +294,24 @@ public class EventService {
                         FileUtils.cleanDirectory(new File(getPath.toString()));
                         System.out.println("have file");
                         fileStorageService.storeFile(multipartFile, id);
+                        event.setFileName(multipartFile.getOriginalFilename());
+                        updateEvent.setFileName(multipartFile.getOriginalFilename());
                     }
                     fileStorageService.storeFile(multipartFile, id);
+                    event.setFileName(multipartFile.getOriginalFilename());
+                    updateEvent.setFileName(multipartFile.getOriginalFilename());
                 }
+                System.out.println(event.getFileName());
             }
         } else {
             Files.createDirectories(directoryPath.toPath());
             fileStorageService.storeFile(multipartFile, id);
+            event.setFileName(multipartFile.getOriginalFilename());
+            updateEvent.setFileName(multipartFile.getOriginalFilename());
+            System.out.println(event.getFileName());
         }
         repository.saveAndFlush(event);
-        return  updateEvent;
+        return updateEvent;
     }
 
 

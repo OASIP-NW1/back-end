@@ -44,7 +44,6 @@ public class EventController {
     public List<EventDTO> getAllSubject(HttpServletRequest httpServletRequest){
         return eventService.getAll(httpServletRequest);
     }
-
     @GetMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
     public EventDetailDTO getEventById(@PathVariable Integer id, HttpServletRequest request) {
