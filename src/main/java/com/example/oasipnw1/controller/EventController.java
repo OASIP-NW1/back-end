@@ -44,6 +44,7 @@ public class EventController {
     public List<EventDTO> getAllSubject(HttpServletRequest httpServletRequest){
         return eventService.getAll(httpServletRequest);
     }
+
     @GetMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
     public EventDetailDTO getEventById(@PathVariable Integer id, HttpServletRequest request) {
@@ -69,12 +70,13 @@ public class EventController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id ) {
-        eventRepository.findById(id).orElseThrow(()->
-                new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        id + " does not exist !!!"));
-        fileStorageService.Deletefile(id);
-        eventRepository.deleteById(id);
+    public void delete(@PathVariable Integer id ,@Valid HttpServletRequest request) {
+//        eventRepository.findById(id).orElseThrow(()->
+//                new ResponseStatusException(HttpStatus.NOT_FOUND,
+//                        id + " does not exist !!!"));
+//        fileStorageService.Deletefile(id);
+//        eventRepository.deleteById(id);
+        eventService.delete(id,request);
     }
 
     @PutMapping("/{id}")

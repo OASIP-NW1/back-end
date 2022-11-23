@@ -310,8 +310,30 @@ public class EventService {
             updateEvent.setFileName(multipartFile.getOriginalFilename());
             System.out.println(event.getFileName());
         }
+        fileStorageService.Deletefile(id);
         repository.saveAndFlush(event);
         return updateEvent;
+    }
+
+    public void delete(Integer id,HttpServletRequest request) {
+        Event event = repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                id + " does not exist !!!"));
+        String getUserEmail = getUserEmail(getRequestAccessToken(request));
+        User user = userRepository.findByEmail(getUserEmail);
+        if(user != null) {
+            if((request.isUserInRole("ROLE_student")) && !event.getBookingEmail().equals(user.getEmail())) {
+                System.out.println("Cannot delete event which you didn't own");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot delete event which you didn't own");
+            }
+//            if((request.isUserInRole("ROLE_lecturer"))) {
+//                System.out.println("Only student, admin can delete event");
+//                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only student, admin can delete event");
+//            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Please Sign in again");}
+        fileStorageService.Deletefile(id);
+        repository.deleteById(id);
+//        return id;
     }
 
 
