@@ -246,6 +246,9 @@ public class EventService {
         if (request.isUserInRole("student")) {
             System.out.println("Booking email same as the student's email!!!");
             repository.saveAndFlush(event);
+        } else if (request.isUserInRole("admin")){
+            System.out.println("Admin can edit event!!!");
+            repository.saveAndFlush(event);
         } else {
             System.out.println("Booking email must be the same as student's email!!!");
             throw new AccessDeniedException("");
@@ -335,7 +338,6 @@ public class EventService {
         repository.deleteById(id);
 //        return id;
     }
-
 
     public User getUserFromRequest(HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7);
