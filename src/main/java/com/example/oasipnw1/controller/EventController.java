@@ -71,12 +71,12 @@ public class EventController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id ,@Valid HttpServletRequest request) {
-//        eventRepository.findById(id).orElseThrow(()->
-//                new ResponseStatusException(HttpStatus.NOT_FOUND,
-//                        id + " does not exist !!!"));
+        eventRepository.findById(id).orElseThrow(()->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        id + " does not exist !!!"));
 //        fileStorageService.Deletefile(id);
-//        eventRepository.deleteById(id);
-        eventService.delete(id,request);
+        eventRepository.deleteById(id);
+//        eventService.delete(id,request);
     }
 
     @PutMapping("/{id}")

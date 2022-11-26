@@ -246,8 +246,8 @@ public class EventService {
         if (request.isUserInRole("student")) {
             System.out.println("Booking email same as the student's email!!!");
             repository.saveAndFlush(event);
-        } else if (request.isUserInRole("admin")){
-            System.out.println("Admin can edit event!!!");
+        } else if (request.isUserInRole("admin")) {
+            System.out.println("Admin can edit");
             repository.saveAndFlush(event);
         } else {
             System.out.println("Booking email must be the same as student's email!!!");
@@ -290,7 +290,10 @@ public class EventService {
                 System.out.println("current file: " + multipartFile.getOriginalFilename());
                 System.out.println("check same file: " + multipartFile.getOriginalFilename().equals(fileName));
                 if (multipartFile.getOriginalFilename().isEmpty()) {
+//                    updateEvent.setFileName(StringUtils.cleanPath(multipartFile.getOriginalFilename()));
+                    fileStorageService.Deletefile(id);
                     System.out.println("Equal file name");
+
                 } else {
                     System.out.println("No equal file name");
                     if (Files.exists(Path.of(getPath.toString()))) {
@@ -299,6 +302,7 @@ public class EventService {
                         fileStorageService.storeFile(multipartFile, id);
                         event.setFileName(multipartFile.getOriginalFilename());
                         updateEvent.setFileName(multipartFile.getOriginalFilename());
+
                     }
                     fileStorageService.storeFile(multipartFile, id);
                     event.setFileName(multipartFile.getOriginalFilename());
@@ -306,17 +310,19 @@ public class EventService {
                 }
                 System.out.println(event.getFileName());
             }
-        } else {
-            Files.createDirectories(directoryPath.toPath());
-            fileStorageService.storeFile(multipartFile, id);
-            event.setFileName(multipartFile.getOriginalFilename());
-            updateEvent.setFileName(multipartFile.getOriginalFilename());
-            System.out.println(event.getFileName());
         }
-        fileStorageService.Deletefile(id);
+        else {
+                Files.createDirectories(directoryPath.toPath());
+                fileStorageService.storeFile(multipartFile, id);
+                event.setFileName(multipartFile.getOriginalFilename());
+                updateEvent.setFileName(multipartFile.getOriginalFilename());
+                System.out.println(event.getFileName());
+            }
         repository.saveAndFlush(event);
         return updateEvent;
     }
+
+
 
     public void delete(Integer id,HttpServletRequest request) {
         Event event = repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,

@@ -24,5 +24,6 @@ public class EventUpdateDTO {
 
     private String fileName;
 
+
 //    private MultipartFile File;
 }
