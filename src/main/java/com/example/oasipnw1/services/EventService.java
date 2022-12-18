@@ -1,5 +1,6 @@
 package com.example.oasipnw1.services;
 
+import com.example.oasipnw1.config.JwtRequestFilter;
 import com.example.oasipnw1.config.JwtTokenUtil;
 import com.example.oasipnw1.dtos.EventDTO;
 import com.example.oasipnw1.dtos.EventDetailDTO;
@@ -176,7 +177,7 @@ public class EventService {
                         " doesn't exist."
                 ));
         String getUserEmail = getUserEmail(getRequestAccessToken(request));
-        if (request.isUserInRole("student")) {
+        if (request.isUserInRole("Student")) {
             if (getUserEmail.equals(events.getBookingEmail())) {
                 System.out.println("Booking email same as the student's email!");
                 return modelMapper.map(events, EventDetailDTO.class);
@@ -184,7 +185,7 @@ public class EventService {
                 System.out.println("Booking email must be the same as the student's email!");
                 throw new AccessDeniedException("");
             }
-        } else if (request.isUserInRole("lecturer")) {
+        } else if (request.isUserInRole("Lecturer")) {
             ArrayList<EventCategory> listCategory = new ArrayList<>();
             List<Event> eventsListByCategoryOwner = repository.findEventCategoryOwnerByEmail(getUserEmail);
             System.out.println(eventsListByCategoryOwner);
@@ -243,10 +244,10 @@ public class EventService {
 //            events.getFileName(updateEvent.getFileName(multipartFile.getOriginalFilename()));
             return events;
         }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can't update event, event id" + id + "doesn't exist."));
-        if (request.isUserInRole("student")) {
+        if (request.isUserInRole("Student")) {
             System.out.println("Booking email same as the student's email!!!");
             repository.saveAndFlush(event);
-        } else if (request.isUserInRole("admin")) {
+        } else if (request.isUserInRole("Admin")) {
             System.out.println("Admin can edit");
             repository.saveAndFlush(event);
         } else {
@@ -330,7 +331,7 @@ public class EventService {
         String getUserEmail = getUserEmail(getRequestAccessToken(request));
         User user = userRepository.findByEmail(getUserEmail);
         if(user != null) {
-            if((request.isUserInRole("ROLE_student")) && !event.getBookingEmail().equals(user.getEmail())) {
+            if((request.isUserInRole("ROLE_Student")) && !event.getBookingEmail().equals(user.getEmail())) {
                 System.out.println("Cannot delete event which you didn't own");
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot delete event which you didn't own");
             }
@@ -351,14 +352,17 @@ public class EventService {
         return  userRepository.findByEmail(userEmail);
     }
 
+    @Autowired
+    private JwtRequestFilter jwtRequestFilter;
     public List<EventDTO> getAll(HttpServletRequest request) {
         List<Event> eventsList = repository.findAll(Sort.by(Sort.Direction.DESC, "eventStartTime"));
-        String getUserEmail = getUserEmail(getRequestAccessToken(request));
-        UserDetails userDetails = jwtuserDetailsService.loadUserByUsername(getUserEmail);
-        if (userDetails != null && (request.isUserInRole("ROLE_student"))) {
+
+        String getUserEmail = getUserEmail(jwtRequestFilter.getNewToken());
+//        UserDetails userDetails = jwtuserDetailsService.loadUserByUsername(getUserEmail);
+        if ((request.isUserInRole("ROLE_Student"))) {
             List<Event> eventsListByEmail = repository.findByBookingEmail(getUserEmail);
             return listMapper.mapList(eventsListByEmail, EventDTO.class, modelMapper);
-        } else if (userDetails != null && (request.isUserInRole("ROLE_lecturer"))) {
+        } else if ( (request.isUserInRole("ROLE_Lecturer"))) {
 //            List<Events> eventsListByEmail = repository.findByBookingEmail(getUserEmail);
             List<Event> eventListByCategoryOwner = repository.findEventCategoryOwnerByEmail(getUserEmail);
 

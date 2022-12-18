@@ -73,7 +73,7 @@ public class UserService {
 
         //  Check Validtion Unique Create (name email role)
         if (checkUniqueCreate(newUser)) {
-            addUserList.setRole(newUser.getRole() == null ? Role.student : newUser.getRole());
+            addUserList.setRole(newUser.getRole() == null ? Role.Student : newUser.getRole());
         }
         // Argon2PasswordEncoder : Add Password
         addUserList.setPassword(argon2PasswordEncoder.encode(addUserList.getPassword()));
@@ -144,8 +144,10 @@ public class UserService {
         String status;
 
         if (userRepository.existsByEmail(userLogin.getEmail())) {
+            System.out.println("0");
             User user = userRepository.findByEmail(userLogin.getEmail());
             if (argon2PasswordEncoder.matches(userLogin.getPassword(), user.getPassword())) {
+                System.out.println("1");
                 authenticate(userLogin.getEmail(), userLogin.getPassword());
                 authenticate(userLogin.getEmail(), userLogin.getPassword());
 

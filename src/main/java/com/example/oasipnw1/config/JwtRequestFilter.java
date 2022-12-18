@@ -85,8 +85,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 //                        System.out.println(getNewToken());
 //                    }else
 //                    {
-                        setNewToken(jwtTokenUtil.generateToken(userDetails));
-                        System.out.println(getNewToken());
+                    setNewToken(jwtTokenUtil.generateToken(userDetails));
+                    System.out.println(getNewToken());
 //                    }
 
                 }

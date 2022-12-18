@@ -42,11 +42,12 @@ public class EventController {
     @Autowired
     private FileStorageService fileStorageService;
 
+//    @PreAuthorize("hasAnyAuthority('Admin','Student','Lecturer')")
     @GetMapping("")
     public List<EventDTO> getAllSubject(HttpServletRequest httpServletRequest){
         return eventService.getAll(httpServletRequest);
     }
-
+//    @PreAuthorize("hasAnyAuthority('Admin','Student','Lecturer')")
     @GetMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
     public EventDetailDTO getEventById(@PathVariable Integer id, HttpServletRequest request) {
@@ -63,14 +64,14 @@ public class EventController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("")
-    @PreAuthorize("!isAuthenticated() or hasAnyRole(\"admin\",\"student\")")
+//    @PreAuthorize("!isAuthenticated() or hasAnyRole(\"Admin\",\"Student\")")
 //    public void Event (@Valid HttpServletRequest request , @Valid @RequestBody Event event )
     public void EventDTO (@Valid HttpServletRequest request ,
                           @Valid @RequestPart EventDTO eventDTO ,
                           @RequestPart(value = "file" , required = false) MultipartFile multipartFile) throws IOException {
         eventService.save(request,eventDTO,multipartFile);
     }
-
+//    @PreAuthorize("hasAnyAuthority('Admin','Student')")
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id ,@Valid HttpServletRequest request) {
         eventRepository.findById(id).orElseThrow(()->
@@ -79,6 +80,7 @@ public class EventController {
         fileStorageService.Deletefile(id);
         eventRepository.deleteById(id);
     }
+//    @PreAuthorize("hasAnyAuthority('Admin','Student')")
     @DeleteMapping("/file/{id}")
     public void delete(@PathVariable Integer id) throws IOException {
         fileStorageService.Deletefile(id);
