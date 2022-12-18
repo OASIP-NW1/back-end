@@ -74,9 +74,8 @@ public class EventController {
         eventRepository.findById(id).orElseThrow(()->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         id + " does not exist !!!"));
-//        fileStorageService.Deletefile(id);
+        fileStorageService.Deletefile(id);
         eventRepository.deleteById(id);
-//        eventService.delete(id,request);
     }
 
     @PutMapping("/{id}")
