@@ -64,6 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.PUT, "/api/events/{id}").hasAnyRole("admin","student")
                 .antMatchers(HttpMethod.DELETE, "/api/events/{id}").hasAnyRole("admin","student")
                 .antMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("admin")
+                .antMatchers(HttpMethod.DELETE, "/api/events/file/{id}").hasAnyRole("admin","student")
 //                eventcategory
                 .antMatchers(HttpMethod.GET,"/api/eventCategory/**").hasAnyRole("admin","guest","student")
                 .antMatchers(HttpMethod.PUT,"/api/eventCategory/**").hasRole("admin")

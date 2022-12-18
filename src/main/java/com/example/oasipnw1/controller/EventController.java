@@ -18,6 +18,8 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -74,9 +76,12 @@ public class EventController {
         eventRepository.findById(id).orElseThrow(()->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         id + " does not exist !!!"));
-//        fileStorageService.Deletefile(id);
+        fileStorageService.Deletefile(id);
         eventRepository.deleteById(id);
-//        eventService.delete(id,request);
+    }
+    @DeleteMapping("/file/{id}")
+    public void delete(@PathVariable Integer id) throws IOException {
+        fileStorageService.Deletefile(id);
     }
 
     @PutMapping("/{id}")

@@ -100,4 +100,5 @@ public class Event {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
+
 }

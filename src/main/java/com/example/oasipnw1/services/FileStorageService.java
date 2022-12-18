@@ -1,15 +1,20 @@
 package com.example.oasipnw1.services;
 
+import com.example.oasipnw1.entites.Event;
 import com.example.oasipnw1.exception.FileStorageException;
 import com.example.oasipnw1.exception.MyFileNotFoundException;
 import com.example.oasipnw1.properties.FileStorageProperties;
+import com.example.oasipnw1.repository.EventRepository;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.io.IOException;
 import java.io.File;
 import java.net.MalformedURLException;
@@ -21,11 +26,13 @@ import java.nio.file.StandardCopyOption;
 @Service
 public class FileStorageService {
     private final Path fileStorageLocation;
+    private final EventRepository eventRepository;
 
     @Autowired
-    public FileStorageService(FileStorageProperties fileStorageProperties) {
+    public FileStorageService(FileStorageProperties fileStorageProperties, EventRepository eventRepository) {
         this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
                 .toAbsolutePath().normalize();
+        this.eventRepository = eventRepository;
 
         try {
             Files.createDirectories(this.fileStorageLocation);
@@ -89,8 +96,14 @@ public class FileStorageService {
     public void Deletefile(Integer id){
        try{
            FileUtils.deleteDirectory(new File(getPathFile(id).toUri()));
+           Event event = eventRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                   id + " does not exist !!!"));
+           event.setFileName(null);
+           eventRepository.saveAndFlush(event);
+
        } catch (IOException e) {
            throw new RuntimeException(e);
        }
+
     }
 }

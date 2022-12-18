@@ -78,7 +78,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     System.out.println("MSIP");
                     String role = payload.getString("roles");
                     String extract = role.replaceAll("[^a-zA-Z]+", "");
-
                     final UserDetails userDetails = new User(payload.getString("preferred_username"),"",Arrays.asList(new SimpleGrantedAuthority(extract)));
 //                    if(payload.has("role") == false){
 //                        System.out.println("skdjf");
