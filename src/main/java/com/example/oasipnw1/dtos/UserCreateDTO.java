@@ -26,7 +26,7 @@ public class UserCreateDTO {
     private String email;
 
     @Enumerated()
-    private Role role = Role.student;
+    private Role role = Role.Student;
 
     @Size(min = 8 , max = 14 , message = "Password must be between 8 - 14 characters.")
     @NotNull(message = "Please input the password")

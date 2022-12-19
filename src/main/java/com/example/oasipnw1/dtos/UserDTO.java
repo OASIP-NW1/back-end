@@ -32,7 +32,7 @@ public class UserDTO {
     @Email(message = "invalid email format")
     private String email;
 
-    private Role role = Role.student;
+    private Role role = Role.Student;
 
     private String password;
 

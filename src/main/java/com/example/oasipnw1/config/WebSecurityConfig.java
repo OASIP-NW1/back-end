@@ -1,3 +1,4 @@
+
 package com.example.oasipnw1.config;
 
 import com.example.oasipnw1.customException.CustomAccessDeniedHandler;
@@ -54,20 +55,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                all role
                 .authorizeRequests()
 //                see category role guest -> edit
-//                .antMatchers("/api/eventCategory").hasRole("guest")
+//                .antMatchers("/api/eventCategory").hasRole("gest")
                 .antMatchers("/api/login","/api/users/signup").permitAll()
 //                admin
-                .antMatchers("/api/users/**","/api/match/**").hasRole("admin")
+                .antMatchers(HttpMethod.GET,"/api/users/**","/api/match/**").hasRole("Admin")
 //                request role
-                .antMatchers(HttpMethod.GET, "/api/events","/api/events/{id}").hasAnyRole("admin","student","lecturer")
+                .antMatchers(HttpMethod.GET, "/api/events","/api/events/{id}").hasAnyRole("Admin","Student","Lecturer")
                 .antMatchers(HttpMethod.POST, "/api/events").permitAll()
-                .antMatchers(HttpMethod.PUT, "/api/events/{id}").hasAnyRole("admin","student")
-                .antMatchers(HttpMethod.DELETE, "/api/events/{id}").hasAnyRole("admin","student")
-                .antMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("admin")
+                .antMatchers(HttpMethod.PUT, "/api/events/{id}").hasAnyRole("Admin","Student")
+                .antMatchers(HttpMethod.DELETE, "/api/events/{id}").hasAnyRole("Admin","Student")
+                .antMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("Admin")
+                .antMatchers(HttpMethod.DELETE, "/api/events/file/{id}").hasAnyRole("Admin","Student")
 //                eventcategory
-                .antMatchers(HttpMethod.GET,"/api/eventCategory/**").hasAnyRole("admin","guest","student")
-                .antMatchers(HttpMethod.PUT,"/api/eventCategory/**").hasRole("admin")
-                .anyRequest().authenticated();
+                .antMatchers(HttpMethod.GET,"/api/eventCategory/**").hasAnyRole("Admin","guest","Student","Lecturer")
+                .antMatchers(HttpMethod.PUT,"/api/eventCategory/**").hasRole("Admin");
+//                .anyRequest().authenticated();
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
