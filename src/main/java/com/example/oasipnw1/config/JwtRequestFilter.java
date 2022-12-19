@@ -62,7 +62,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         final String requestTokenHeader = request.getHeader("Authorization");
-        String username = null;
+         String username = null;
 
 
 //        String jwtToken = null;
@@ -76,11 +76,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     payload = extractMSJwt(getNewToken());
                 }
 
-                username = jwtTokenUtil.getUsernameFromToken(getNewToken());
+
                 System.out.println(username);
 
                 if (StringUtils.hasText(getNewToken()) == true && payload.getString("iss").equals("https://login.microsoftonline.com/6f4432dc-20d2-441d-b1db-ac3380ba633d/v2.0")) {
                     System.out.println("MSIP");
+                    username = payload.getString("preferred_username");
                     if(payload.has("roles")==false){
                         setUserDetails(new User(payload.getString("preferred_username"),"",Arrays.asList(new SimpleGrantedAuthority("ROLE_guest"))));
                         setNewToken(jwtTokenUtil.generateToken(getUserDetails()));
@@ -95,11 +96,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 //                    }else
 //                    {
                         setNewToken(jwtTokenUtil.generateToken(getUserDetails()));
+
                     }
+
                     System.out.println(getNewToken());
 //                    }
 
                 }else if (StringUtils.hasText(getNewToken()) == true && payload.getString("iss").equals("https://intproj21.sit.kmutt.ac.th/kw1/")) {
+                    username = payload.getString("sub");
                     setUserDetails(this.jwtUserDetailsService.loadUserByUsername(username));
                 }
 
