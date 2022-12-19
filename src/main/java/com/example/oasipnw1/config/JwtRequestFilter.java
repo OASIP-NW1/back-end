@@ -55,6 +55,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
+    @Getter @Setter
+    UserDetails userDetails;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
@@ -68,29 +70,40 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         // only the Token
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             setNewToken(requestTokenHeader.substring(7));
-
             try {
                 JSONObject payload = null;
                 if (getNewToken() != null) {
                     payload = extractMSJwt(getNewToken());
                 }
+
+                username = jwtTokenUtil.getUsernameFromToken(getNewToken());
+                System.out.println(username);
+
                 if (StringUtils.hasText(getNewToken()) == true && payload.getString("iss").equals("https://login.microsoftonline.com/6f4432dc-20d2-441d-b1db-ac3380ba633d/v2.0")) {
                     System.out.println("MSIP");
-                    String role = payload.getString("roles");
-                    String extract = role.replaceAll("[^a-zA-Z]+", "");
-                    final UserDetails userDetails = new User(payload.getString("preferred_username"),"",Arrays.asList(new SimpleGrantedAuthority(extract)));
+                    if(payload.has("roles")==false){
+                        setUserDetails(new User(payload.getString("preferred_username"),"",Arrays.asList(new SimpleGrantedAuthority("ROLE_guest"))));
+                        setNewToken(jwtTokenUtil.generateToken(getUserDetails()));
+                    }else {
+                        String role = payload.getString("roles");
+                        String extract = role.replaceAll("[^a-zA-Z]+", "");
+                        setUserDetails( new User(payload.getString("preferred_username"),"",Arrays.asList(new SimpleGrantedAuthority("ROLE_"+extract))));
 //                    if(payload.has("role") == false){
 //                        System.out.println("skdjf");
 //                        setNewToken(jwtTokenUtil.generateToken("Guest", payload.getString("preferred_username"),payload.getString("name")).getAccessToken());
 //                        System.out.println(getNewToken());
 //                    }else
 //                    {
-                    setNewToken(jwtTokenUtil.generateToken(userDetails));
+                        setNewToken(jwtTokenUtil.generateToken(getUserDetails()));
+                    }
                     System.out.println(getNewToken());
 //                    }
 
+                }else if (StringUtils.hasText(getNewToken()) == true && payload.getString("iss").equals("https://intproj21.sit.kmutt.ac.th/kw1/")) {
+                    setUserDetails(this.jwtUserDetailsService.loadUserByUsername(username));
                 }
-                username = jwtTokenUtil.getUsernameFromToken(getNewToken());
+
+
 
             } catch (IllegalArgumentException e) {
                 System.out.println("Unable to get JWT Token");
@@ -113,18 +126,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             logger.warn("JWT Token does not begin with Bearer String");
             request.setAttribute("Errors", "Token doesn't exist");
         }
-
+        System.out.println(username);
+        System.out.println(username != null);
         // Once we get the token validate it.
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
+//            UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
 
             // if token is valid configure Spring Security to manually set
             // authentication
-            if (jwtTokenUtil.validateToken(getNewToken(), userDetails)) {
-
+            if (jwtTokenUtil.validateToken(getNewToken(), getUserDetails())) {
+                System.out.println("test1");
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                String authorities = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining());
+                        getUserDetails(), null, getUserDetails().getAuthorities());
+                String authorities = getUserDetails().getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining());
                 System.out.println("Authorities granted " + authorities);
                 usernamePasswordAuthenticationToken
                         .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

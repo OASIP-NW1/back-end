@@ -115,7 +115,7 @@ public class EventService {
         Event e = modelMapper.map(et, Event.class);
 //          check role bookingemail
         if (request.getHeader("Authorization") != null) {
-            String getUserEmail = getUserEmail(getRequestAccessToken(request));
+            String getUserEmail = getUserEmail(jwtRequestFilter.getNewToken());
             if (request.isUserInRole("student")) {
                 if (getUserEmail.equals(eventDTO.getBookingEmail())) {
                     System.out.println("Booking email same as the student's email!");
@@ -176,7 +176,7 @@ public class EventService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can't get event, event id " + id +
                         " doesn't exist."
                 ));
-        String getUserEmail = getUserEmail(getRequestAccessToken(request));
+        String getUserEmail = getUserEmail(jwtRequestFilter.getNewToken());
         if (request.isUserInRole("Student")) {
             if (getUserEmail.equals(events.getBookingEmail())) {
                 System.out.println("Booking email same as the student's email!");
@@ -328,7 +328,7 @@ public class EventService {
     public void delete(Integer id,HttpServletRequest request) {
         Event event = repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 id + " does not exist !!!"));
-        String getUserEmail = getUserEmail(getRequestAccessToken(request));
+        String getUserEmail = getUserEmail(jwtRequestFilter.getNewToken());
         User user = userRepository.findByEmail(getUserEmail);
         if(user != null) {
             if((request.isUserInRole("ROLE_Student")) && !event.getBookingEmail().equals(user.getEmail())) {
