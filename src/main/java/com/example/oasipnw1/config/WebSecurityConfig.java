@@ -56,16 +56,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
 //                see category role guest -> edit
 //                .antMatchers("/api/eventCategory").hasRole("gest")
-                .antMatchers("/api/login","/api/users/signup").permitAll()
+                .antMatchers(HttpMethod.POST,"/api/login","/api/users/signup").permitAll()
 //                admin
                 .antMatchers(HttpMethod.GET,"/api/users/**","/api/match/**").hasRole("Admin")
 //                request role
-                .antMatchers(HttpMethod.GET, "/api/events","/api/events/{id}").hasAnyRole("Admin","Student","Lecturer")
-                .antMatchers(HttpMethod.POST, "/api/events").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/events","/api/events/{id}").hasAnyRole("Admin","Student","Lecturer","guest")
+                .antMatchers(HttpMethod.POST, "/api/events").hasAnyRole("Admin","Student")
                 .antMatchers(HttpMethod.PUT, "/api/events/{id}").hasAnyRole("Admin","Student")
                 .antMatchers(HttpMethod.DELETE, "/api/events/{id}").hasAnyRole("Admin","Student")
                 .antMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("Admin")
                 .antMatchers(HttpMethod.DELETE, "/api/events/file/{id}").hasAnyRole("Admin","Student")
+                .antMatchers(HttpMethod.GET, "/api/refresh").permitAll()
 //                eventcategory
                 .antMatchers(HttpMethod.GET,"/api/eventCategory/**").hasAnyRole("Admin","guest","Student","Lecturer")
                 .antMatchers(HttpMethod.PUT,"/api/eventCategory/**").hasRole("Admin");
