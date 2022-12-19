@@ -47,6 +47,7 @@ public class EventController {
     public List<EventDTO> getAllSubject(HttpServletRequest httpServletRequest){
         return eventService.getAll(httpServletRequest);
     }
+
     //    @PreAuthorize("hasAnyAuthority('Admin','Student','Lecturer')")
     @GetMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
@@ -68,9 +69,12 @@ public class EventController {
 //    public void Event (@Valid HttpServletRequest request , @Valid @RequestBody Event event )
     public void EventDTO (@Valid HttpServletRequest request ,
                           @Valid @RequestPart EventDTO eventDTO ,
-                          @RequestPart(value = "file" , required = false) MultipartFile multipartFile) throws IOException {
+                          @RequestPart(value = "file" , required = false)
+                                      MultipartFile multipartFile) throws IOException {
         eventService.save(request,eventDTO,multipartFile);
     }
+
+
     //    @PreAuthorize("hasAnyAuthority('Admin','Student')")
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id ,@Valid HttpServletRequest request) {

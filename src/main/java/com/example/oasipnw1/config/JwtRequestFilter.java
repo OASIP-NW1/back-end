@@ -62,7 +62,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         final String requestTokenHeader = request.getHeader("Authorization");
-         String username = null;
+        String username = null;
 
 
 //        String jwtToken = null;
@@ -76,19 +76,18 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     payload = extractMSJwt(getNewToken());
                 }
 
-
                 System.out.println(username);
 
                 if (StringUtils.hasText(getNewToken()) == true && payload.getString("iss").equals("https://login.microsoftonline.com/6f4432dc-20d2-441d-b1db-ac3380ba633d/v2.0")) {
                     System.out.println("MSIP");
                     username = payload.getString("preferred_username");
-                    if(payload.has("roles")==false){
-                        setUserDetails(new User(payload.getString("preferred_username"),"",Arrays.asList(new SimpleGrantedAuthority("ROLE_guest"))));
+                    if (payload.has("roles") == false) {
+                        setUserDetails(new User(payload.getString("preferred_username"), "", Arrays.asList(new SimpleGrantedAuthority("ROLE_guest"))));
                         setNewToken(jwtTokenUtil.generateToken(getUserDetails()));
-                    }else {
+                    } else {
                         String role = payload.getString("roles");
                         String extract = role.replaceAll("[^a-zA-Z]+", "");
-                        setUserDetails( new User(payload.getString("preferred_username"),"",Arrays.asList(new SimpleGrantedAuthority("ROLE_"+extract))));
+                        setUserDetails(new User(payload.getString("preferred_username"), "", Arrays.asList(new SimpleGrantedAuthority("ROLE_" + extract))));
 //                    if(payload.has("role") == false){
 //                        System.out.println("skdjf");
 //                        setNewToken(jwtTokenUtil.generateToken("Guest", payload.getString("preferred_username"),payload.getString("name")).getAccessToken());
@@ -102,11 +101,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     System.out.println(getNewToken());
 //                    }
 
-                }else if (StringUtils.hasText(getNewToken()) == true && payload.getString("iss").equals("https://intproj21.sit.kmutt.ac.th/kw1/")) {
+                } else if (StringUtils.hasText(getNewToken()) == true && payload.getString("iss").equals("https://intproj21.sit.kmutt.ac.th/kw1/")) {
                     username = payload.getString("sub");
                     setUserDetails(this.jwtUserDetailsService.loadUserByUsername(username));
                 }
-
 
 
             } catch (IllegalArgumentException e) {
@@ -114,14 +112,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             } catch (ExpiredJwtException e) {
                 String requestURL = request.getRequestURL().toString();
                 System.out.println(requestURL);
-                if(requestURL.contains("refresh")){
+                if (requestURL.contains("refresh")) {
                     request.setAttribute("Errors", "Refresh token was expired. Please make a new signin request");
-                }else{
+                } else {
                     request.setAttribute("Errors", e.getMessage());
                 }
-            }catch (MalformedJwtException e){
+            } catch (MalformedJwtException e) {
                 request.setAttribute("Errors", e.getMessage());
-            }catch (SignatureException e){
+            } catch (SignatureException e) {
                 request.setAttribute("Errors", e.getMessage());
             } catch (JSONException e) {
                 throw new RuntimeException(e);
@@ -154,6 +152,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
         chain.doFilter(request, response);
     }
+
     @SneakyThrows
     public JSONObject extractMSJwt(String token) {
         String[] chunks = token.split("\\.");
