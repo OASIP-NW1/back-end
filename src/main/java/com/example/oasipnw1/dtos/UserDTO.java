@@ -34,7 +34,7 @@ public class UserDTO {
 
     private Role role = Role.Student;
 
-    private String password;
+//    private String password;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdOn;
