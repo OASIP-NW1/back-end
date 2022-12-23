@@ -56,7 +56,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
 //                see category role guest -> edit
                 .antMatchers(HttpMethod.POST,"/api/login").permitAll()
-                .antMatchers(HttpMethod.POST,"/api/match/**","/api/users/signup").hasRole("Admin")
+                .antMatchers(HttpMethod.POST,"/api/users/signup").hasRole("Admin")
+                .antMatchers(HttpMethod.POST,"/api/match/**").hasRole("Admin")
 //                admin
                 .antMatchers(HttpMethod.GET,"/api/users/**","/api/match/**").hasRole("Admin")
 //                request role
